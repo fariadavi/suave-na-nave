@@ -1,48 +1,50 @@
-package Java2D;
+package main.com.github.fariadavi.game.items;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import javax.swing.ImageIcon;
+import javax.swing.*;
+import java.awt.*;
 
-public class Drop {
+public class MissileDrop {
     private Image dropImg;
     public double frametime, px, py;
     public boolean ativo;
-    
-    public Drop(String imagePath) {
+
+    public MissileDrop(String imagePath) {
         dropImg = new ImageIcon(this.getClass().getResource(imagePath)).getImage();
     }
-    
+
     public void ativar(double pxNave, double pyNave) {
-        ativo = true;       
-        px = pxNave;
-        py = pyNave;     
+        ativo = true;
+    px = pxNave;
+        py = pyNave;
     }
+
     public void desativar() {
         ativo = false;
         frametime = 0;
     }
+
     public boolean ativo() {
         return ativo;
     }
-    
+
     public double getPX() {
         return px;
     }
+
     public double getPY() {
         return py;
     }
-    
+
     public void update(double dt) {
-        if(ativo)
-            frametime+=dt;
-        if(frametime>80) 
+        if (ativo)
+            frametime += dt;
+        if (frametime > 80)
             desativar();
-        px-=5*dt;
+        px -= 5 * dt;
     }
-    
+
     public void draw(Graphics2D g2d) {
-        if(ativo)
-            g2d.drawImage(dropImg, (int)px+16, (int)py+16, null);  
+        if (ativo)
+            g2d.drawImage(dropImg, (int) px + 16, (int) py + 16, null);
     }
 }
