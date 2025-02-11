@@ -1,11 +1,13 @@
 package main.com.github.fariadavi.game.ships;
 
 public class BigBang extends Ship {
+
+    public static final String SPRITE_PATH = "sprites/ships/enemy3.png";
+
     private double pyInic;
 
     public BigBang() {
-
-        super(true, 3, "sprite_naves/enemy3.png", randInt(100, 140));
+        super(true, 3, SPRITE_PATH, randInt(100, 140));
     }
 
     public void setPYinic(int PYsorteado) {

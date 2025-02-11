@@ -1,5 +1,7 @@
 package main.com.github.fariadavi.game.shots;
 
+import main.com.github.fariadavi.utils.FileHelper;
+
 import java.awt.Image;
 import javax.swing.ImageIcon;
 
@@ -10,7 +12,7 @@ public abstract class Shot {
     protected boolean ativo = false;
 
     public Shot(String imagePath, int multiplier) {
-        spriteTiro = new ImageIcon(this.getClass().getResource(imagePath)).getImage();
+        spriteTiro = new ImageIcon(FileHelper.getResource(imagePath)).getImage();
         multiplicador = multiplier;
     }
 

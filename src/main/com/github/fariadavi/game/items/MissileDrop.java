@@ -1,5 +1,7 @@
 package main.com.github.fariadavi.game.items;
 
+import main.com.github.fariadavi.utils.FileHelper;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,7 +11,7 @@ public class MissileDrop {
     public boolean ativo;
 
     public MissileDrop(String imagePath) {
-        dropImg = new ImageIcon(this.getClass().getResource(imagePath)).getImage();
+        dropImg = new ImageIcon(FileHelper.getResource(imagePath)).getImage();
     }
 
     public void ativar(double pxNave, double pyNave) {

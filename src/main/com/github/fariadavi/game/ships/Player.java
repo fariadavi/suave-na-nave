@@ -1,5 +1,7 @@
 package main.com.github.fariadavi.game.ships;
 
+import main.com.github.fariadavi.utils.FileHelper;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -13,8 +15,8 @@ public class Player extends Ship {
     public boolean[] key_states = new boolean[256];
 
     public Player() {
-        super(false, 4, "sprite_naves/spaceship.png", 150);
-        spriteNaveBoosted = new ImageIcon(this.getClass().getResource("sprite_naves/spaceship-boosted.png")).getImage();
+        super(false, 4, "sprites/ships/spaceship.png", 150);
+        spriteNaveBoosted = new ImageIcon(FileHelper.getResource("sprites/ships/spaceship-boosted.png")).getImage();
         px = 80;
         py = 280;
         spawn(px, py);

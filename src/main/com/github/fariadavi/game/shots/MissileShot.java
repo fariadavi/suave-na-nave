@@ -6,7 +6,7 @@ public class MissileShot extends Shot {
     private double multX, multY, quadHip;
 
     public MissileShot() {
-        super("sprite_tiros/shot_missile3.png", 800);
+        super("sprites/shots/shot_missile3.png", 800);
     }
 
     public void setMult(double dX, double dY) {

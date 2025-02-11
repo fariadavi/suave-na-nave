@@ -1,5 +1,7 @@
 package main.com.github.fariadavi.game.ships;
 
+import main.com.github.fariadavi.utils.FileHelper;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import javax.swing.ImageIcon;
@@ -12,15 +14,15 @@ public abstract class Ship {
     protected Image[] explosao = new Image[16];
 
     public Ship(boolean drop, int healthPoints, String imagePath, int mult) {
-        spriteNave = new ImageIcon(this.getClass().getResource(imagePath)).getImage();
+        spriteNave = new ImageIcon(FileHelper.getResource(imagePath)).getImage();
         multiplicadorInicial = mult;
         multiplicador = multiplicadorInicial;
         dropavel = drop;
         hpInic = healthPoints;
         hp = hpInic;
-        missilDrop = new ImageIcon(this.getClass().getResource("sprite_tiros/shot_missile3.png")).getImage();
+        missilDrop = new ImageIcon(FileHelper.getResource("sprites/shots/shot_missile3.png")).getImage();
         for (int i = 0; i < 16; i++)
-            explosao[i] = new ImageIcon(this.getClass().getResource("sprite_explosao/exp" + (i + 1) + ".png")).getImage();
+            explosao[i] = new ImageIcon(FileHelper.getResource("sprites/explosion/" + (i + 1) + ".png")).getImage();
     }
 
     public static int randInt(int min, int max) {

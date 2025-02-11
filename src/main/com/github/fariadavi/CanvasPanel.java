@@ -24,10 +24,31 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import static main.com.github.fariadavi.utils.FileHelper.getImage;
+
 public class CanvasPanel extends JPanel implements Runnable {
+
+    // TITLE SCREEN IMAGE PATHS
+    public static final String SPRITE_TEXTS_GAMETITLE_PATH = "sprites/texts/title.png";
+    public static final String SPRITE_MENUOPTION_NEWGAME_PATH = "sprites/texts/menu/newgame.png";
+    public static final String SPRITE_MENUOPTION_HOVER_NEWGAME_PATH = "sprites/texts/menu/newgame_selected.png";
+    public static final String SPRITE_MENUOPTION_HIGHSCORES_PATH = "sprites/texts/menu/highscores.png";
+    public static final String SPRITE_MENUOPTION_HOVER_HIGHSCORES_PATH = "sprites/texts/menu/highscores_selected.png";
+    public static final String SPRITE_MENUOPTION_CREDITS_PATH = "sprites/texts/menu/credits.png";
+    public static final String SPRITE_MENUOPTION_HOVER_CREDITS_PATH = "sprites/texts/menu/credits_selected.png";
+    public static final String SPRITE_MENUOPTION_QUITGAME_PATH = "sprites/texts/menu/quit.png";
+    public static final String SPRITE_MENUOPTION_HOVER_QUITGAME_PATH = "sprites/texts/menu/quit_selected.png";
+    public static final String SPRITE_TEXTS_CREDITS_DEVLIST_PATH = "sprites/texts/developer_list.png";
+    public static final String SPRITE_BG_TITLESCREEN_PATH = "sprites/ui/titlescreen_bg%i%.png";
+
+    // IN GAME IMAGE PATHS
+    public static final String SPRITE_UI_HEALTH_INDICATOR_PATH = "sprites/ui/gui_spaceship.png";
+    public static final String SPRITE_UI_MISSILES_INDICATOR_PATH = "sprites/ui/gui_missile.png";
+    public static final String SPRITE_ITEMS_DROPPEDMISSILE_PATH = "sprites/items/dropped_missile.png";
+    public static final String SPRITE_TEXTS_GAMEOVER_PATH = "sprites/texts/gameover.png";
+
     private Player player;
     private Highscore recorde;
     private RedUFO[] redUFO = new RedUFO[16];
@@ -163,25 +184,25 @@ public class CanvasPanel extends JPanel implements Runnable {
         addMouseListener(new MouseAdapter());
         player = new Player();
         recorde = new Highscore();
-        gui_vidas = new ImageIcon(this.getClass().getResource("sprite_ui/gui_spaceship.png")).getImage();
-        gui_misseis = new ImageIcon(this.getClass().getResource("sprite_ui/gui_missile.png")).getImage();
-        title = new ImageIcon(this.getClass().getResource("sprite_ui/title.png")).getImage();
-        menu[0] = new ImageIcon(this.getClass().getResource("sprite_ui/newgame.png")).getImage();
-        menu[1] = new ImageIcon(this.getClass().getResource("sprite_ui/records.png")).getImage();
-        menu[2] = new ImageIcon(this.getClass().getResource("sprite_ui/credits.png")).getImage();
-        menu[3] = new ImageIcon(this.getClass().getResource("sprite_ui/quit.png")).getImage();
-        menu[4] = new ImageIcon(this.getClass().getResource("sprite_ui/newgame_selected.png")).getImage();
-        menu[5] = new ImageIcon(this.getClass().getResource("sprite_ui/records_selected.png")).getImage();
-        menu[6] = new ImageIcon(this.getClass().getResource("sprite_ui/credits_selected.png")).getImage();
-        menu[7] = new ImageIcon(this.getClass().getResource("sprite_ui/quit_selected.png")).getImage();
-        imgCreditos = new ImageIcon(this.getClass().getResource("sprite_ui/developer_list.png")).getImage();
-        gameOver = new ImageIcon(this.getClass().getResource("sprite_ui/gameover.png")).getImage();
+        gui_vidas = getImage(SPRITE_UI_HEALTH_INDICATOR_PATH);
+        gui_misseis = getImage(SPRITE_UI_MISSILES_INDICATOR_PATH);
+        title = getImage(SPRITE_TEXTS_GAMETITLE_PATH);
+        menu[0] = getImage(SPRITE_MENUOPTION_NEWGAME_PATH);
+        menu[1] = getImage(SPRITE_MENUOPTION_HIGHSCORES_PATH);
+        menu[2] = getImage(SPRITE_MENUOPTION_CREDITS_PATH);
+        menu[3] = getImage(SPRITE_MENUOPTION_QUITGAME_PATH);
+        menu[4] = getImage(SPRITE_MENUOPTION_HOVER_NEWGAME_PATH);
+        menu[5] = getImage(SPRITE_MENUOPTION_HOVER_HIGHSCORES_PATH);
+        menu[6] = getImage(SPRITE_MENUOPTION_HOVER_CREDITS_PATH);
+        menu[7] = getImage(SPRITE_MENUOPTION_HOVER_QUITGAME_PATH);
+        imgCreditos = getImage(SPRITE_TEXTS_CREDITS_DEVLIST_PATH);
+        gameOver = getImage(SPRITE_TEXTS_GAMEOVER_PATH);
         rectNewGame = new Rectangle(796 / 4 * 3 - 278 / 2, 250, menu[0].getWidth(this), menu[0].getHeight(this));
         rectRecords = new Rectangle(796 / 4 * 3 - 262 / 2, 310, menu[1].getWidth(this), menu[1].getHeight(this));
         rectCredits = new Rectangle(796 / 4 * 3 - 242 / 2, 370, menu[2].getWidth(this), menu[2].getHeight(this));
         rectQuit = new Rectangle(796 / 4 * 3 - 150 / 2, 430, menu[3].getWidth(this), menu[3].getHeight(this));
         for (int i = 0; i < 5; i++)
-            backgroundMenu[i] = new ImageIcon(this.getClass().getResource("sprite_ui/menu" + (i + 1) + ".png")).getImage();
+            backgroundMenu[i] = getImage(SPRITE_BG_TITLESCREEN_PATH.replaceFirst("%i%", String.valueOf(i + 1)));
         for (int i = 0; i < 16; i++) {
             redUFO[i] = new RedUFO();
             greenFire[i] = new GreenFire();
@@ -192,7 +213,7 @@ public class CanvasPanel extends JPanel implements Runnable {
         for (int i = 0; i < 3; i++)
             misseis[i] = new MissileShot();
         for (int i = 0; i < 64; i++)
-            missilMissileDrop[i] = new MissileDrop("sprite_tiros/dropped_missile.png");
+            missilMissileDrop[i] = new MissileDrop(SPRITE_ITEMS_DROPPEDMISSILE_PATH);
         // for estrelas load
         for (int i = 0; i < 300; i++) {
             estrelas[i] = new BgStar();

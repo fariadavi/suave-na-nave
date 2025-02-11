@@ -11,7 +11,7 @@ public class GreenFire extends Ship {
     private RegularShot[] tirosGF = new RegularShot[16];
 
     public GreenFire() {
-        super(true, 1, "sprite_naves/enemy2.png", randInt(60, 100));
+        super(true, 1, "sprites/ships/enemy2.png", randInt(60, 100));
         for (int i = 0; i < 16; i++)
             tirosGF[i] = new RegularShot(true);
     }

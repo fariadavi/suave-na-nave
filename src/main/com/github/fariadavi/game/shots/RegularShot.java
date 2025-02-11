@@ -1,5 +1,7 @@
 package main.com.github.fariadavi.game.shots;
 
+import main.com.github.fariadavi.utils.FileHelper;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import javax.swing.ImageIcon;
@@ -9,9 +11,9 @@ public class RegularShot extends Shot {
     private boolean tiroInim;
 
     public RegularShot(boolean tiroInimigo) {
-        super("sprite_tiros/shot_regular.png", 200);
+        super("sprites/shots/shot_regular.png", 200);
         tiroInim = tiroInimigo;
-        tiroSimplesInim = new ImageIcon(this.getClass().getResource("sprite_tiros/enemy_shot.png")).getImage();
+        tiroSimplesInim = new ImageIcon(FileHelper.getResource("sprites/shots/enemy_shot.png")).getImage();
     }
 
     public void setOrientacao(int sent) {

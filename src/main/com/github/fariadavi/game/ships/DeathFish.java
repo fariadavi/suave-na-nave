@@ -11,7 +11,7 @@ public class DeathFish extends Ship {
     private RegularShot[] tirosDF = new RegularShot[16];
 
     public DeathFish() {
-        super(true, 5, "sprite_naves/enemy4.png", randInt(60, 100));
+        super(true, 5, "sprites/ships/enemy4.png", randInt(60, 100));
         for (int i = 0; i < 16; i++)
             tirosDF[i] = new RegularShot(true);
     }

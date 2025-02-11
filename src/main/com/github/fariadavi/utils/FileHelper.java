@@ -1,5 +1,7 @@
 package main.com.github.fariadavi.utils;
 
+import javax.swing.ImageIcon;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -8,8 +10,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 
 public class FileHelper {
+    public static Image getImage(String imagePath) {
+        return new ImageIcon(getResource(imagePath)).getImage();
+    }
+
+    public static URL getResource(String path) {
+        return FileHelper.class.getClassLoader().getResource("main/resources/" + path);
+    }
+
     public static void escreve(String nomeEntrado, int pts) {
         BufferedWriter file;
         try {
