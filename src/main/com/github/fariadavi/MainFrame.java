@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 public class MainFrame extends JFrame {
 
     public MainFrame() {
-        setTitle("Joguinho LOCO");
+        setTitle("Suave na Nave");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         add(new CanvasPanel());
         setSize(800, 600);
@@ -16,11 +16,6 @@ public class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
 }

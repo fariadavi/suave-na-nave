@@ -1,5 +1,6 @@
 package main.com.github.fariadavi.game.ships;
 
+import main.com.github.fariadavi.CanvasPanel;
 import main.com.github.fariadavi.utils.FileHelper;
 
 import java.awt.Graphics2D;
@@ -7,16 +8,18 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
+import static main.com.github.fariadavi.utils.SpriteMappings.SPRITES_SHIPS_PLAYER_SPACESHIP_BOOSTED_PATH;
+import static main.com.github.fariadavi.utils.SpriteMappings.SPRITES_SHIPS_PLAYER_SPACESHIP_PATH;
+
 public class Player extends Ship {
     private Image spriteNaveBoosted;
     double frametimeTiro = 0, frametimeMissil = 0, frametimePontos = 0;
     private int pontos = 0, misseis = 3;
     private boolean missilAtivo, tiroAtivo;
-    public boolean[] key_states = new boolean[256];
 
     public Player() {
-        super(false, 4, "sprites/ships/spaceship.png", 150);
-        spriteNaveBoosted = new ImageIcon(FileHelper.getResource("sprites/ships/spaceship-boosted.png")).getImage();
+        super(false, 4, SPRITES_SHIPS_PLAYER_SPACESHIP_PATH, 150);
+        spriteNaveBoosted = FileHelper.getImage(SPRITES_SHIPS_PLAYER_SPACESHIP_BOOSTED_PATH);
         px = 80;
         py = 280;
         spawn(px, py);
@@ -98,7 +101,7 @@ public class Player extends Ship {
         return posicao[posReturn];
     }
 
-    public void update(double dt) {
+    public void update(double dt, CanvasPanel canvasPanel) {
         frametimeTiro += dt;
         frametimeMissil += dt;
         tempoTurbo += dt;
@@ -112,7 +115,7 @@ public class Player extends Ship {
             setTurbo(false, tempoTurbo);
         }
 
-        if ((key_states[KeyEvent.VK_SHIFT])) {
+        if ((canvasPanel.key_states[KeyEvent.VK_SHIFT])) {
             if (tempoTurbo > 20) {
                 tempoTurbo = 0;
                 multiplicador *= 2.2;
@@ -120,22 +123,22 @@ public class Player extends Ship {
             }
         }
 
-        if (key_states[KeyEvent.VK_V] && frametimeTiro > 0.5) {
+        if (canvasPanel.key_states[KeyEvent.VK_V] && frametimeTiro > 0.5) {
             tiroAtivo = true;
             frametimeTiro = 0;
         }
-        if (key_states[KeyEvent.VK_B] && frametimeMissil > 1.5) {
+        if (canvasPanel.key_states[KeyEvent.VK_B] && frametimeMissil > 1.5) {
             missilAtivo = true;
             frametimeMissil = 0;
         }
-        if ((key_states[KeyEvent.VK_RIGHT]) && (px < 670)) {
+        if ((canvasPanel.key_states[KeyEvent.VK_RIGHT]) && (px < 670)) {
             px += multiplicador * dt;
-        } else if ((key_states[KeyEvent.VK_LEFT]) && (px > -62)) {
+        } else if ((canvasPanel.key_states[KeyEvent.VK_LEFT]) && (px > -62)) {
             px -= multiplicador * dt;
         }
-        if ((key_states[KeyEvent.VK_UP]) && (py > -50)) {
+        if ((canvasPanel.key_states[KeyEvent.VK_UP]) && (py > -50)) {
             py -= multiplicador * dt;
-        } else if ((key_states[KeyEvent.VK_DOWN]) && (py < 490)) {
+        } else if ((canvasPanel.key_states[KeyEvent.VK_DOWN]) && (py < 490)) {
             py += multiplicador * dt;
         }
     }

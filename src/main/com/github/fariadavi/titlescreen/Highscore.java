@@ -1,4 +1,4 @@
-package main.com.github.fariadavi.ui;
+package main.com.github.fariadavi.titlescreen;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.io.IOException;
 
 public class Highscore {
     private double px = 365, py = 610;
@@ -21,7 +20,7 @@ public class Highscore {
         return ativo;
     }
 
-    public void ativar() throws IOException {
+    public void ativar() {
         ativo = true;
 //        nomes = ManipulaArquivo.getNomes();
 //        pts = ManipulaArquivo.getPts();

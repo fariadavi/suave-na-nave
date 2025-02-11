@@ -11,7 +11,7 @@ public class MissileDrop {
     public boolean ativo;
 
     public MissileDrop(String imagePath) {
-        dropImg = new ImageIcon(FileHelper.getResource(imagePath)).getImage();
+        dropImg = FileHelper.getImage(imagePath);
     }
 
     public void ativar(double pxNave, double pyNave) {

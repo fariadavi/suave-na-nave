@@ -1,4 +1,4 @@
-package main.com.github.fariadavi.ui;
+package main.com.github.fariadavi.game.decorations;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

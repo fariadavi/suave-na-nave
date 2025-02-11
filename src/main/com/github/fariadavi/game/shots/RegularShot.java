@@ -13,7 +13,7 @@ public class RegularShot extends Shot {
     public RegularShot(boolean tiroInimigo) {
         super("sprites/shots/shot_regular.png", 200);
         tiroInim = tiroInimigo;
-        tiroSimplesInim = new ImageIcon(FileHelper.getResource("sprites/shots/enemy_shot.png")).getImage();
+        tiroSimplesInim = FileHelper.getImage("sprites/shots/enemy_shot.png");
     }
 
     public void setOrientacao(int sent) {

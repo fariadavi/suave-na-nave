@@ -12,7 +12,7 @@ public abstract class Shot {
     protected boolean ativo = false;
 
     public Shot(String imagePath, int multiplier) {
-        spriteTiro = new ImageIcon(FileHelper.getResource(imagePath)).getImage();
+        spriteTiro = FileHelper.getImage(imagePath);
         multiplicador = multiplier;
     }
 
