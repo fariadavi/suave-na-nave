@@ -32,7 +32,7 @@ public class GameRun {
     private BgStar[] estrelas = new BgStar[300];
 
     private Image gui_vidas, gui_misseis, gameOver;
-//    private boolean chargeMissil = false, pressed = false;
+    //    private boolean chargeMissil = false, pressed = false;
     private double[] deltaInimigos = new double[64];
     private int[] posInimigos = new int[64];
     private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, tamPontuacao, ptsAsomar = 0, posMenuHighlited = 0;
@@ -88,7 +88,8 @@ public class GameRun {
         }
     }
 
-    public void update(double dt, CanvasPanel canvasPanel) {frametimeSomaPts += dt;
+    public void update(double dt, CanvasPanel canvasPanel) {
+        frametimeSomaPts += dt;
         if (ptsAsomar > 0 && frametimeSomaPts > 0.02) {
             player.addPts();
             ptsAsomar--;
@@ -480,7 +481,7 @@ public class GameRun {
 //                        recordes=true;
                 }
 
-                canvasPanel.goBack();
+                canvasPanel.returnToTitleScreen();
             }
         }
     }

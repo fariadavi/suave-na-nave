@@ -61,8 +61,8 @@ public class FileHelper {
 
     public static String[] getNomes() {
         int i = 0;
-        String[] nomes = new String[15];
-        int[] pontos = new int[15];
+        String[] nomes = new String[10];
+        int[] pontos = new int[10];
         BufferedReader fileread;
         try {
             fileread = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.dat")));

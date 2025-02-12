@@ -6,7 +6,6 @@ import main.com.github.fariadavi.utils.FileHelper;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
 
 import static main.com.github.fariadavi.utils.SpriteMappings.SPRITES_SHIPS_PLAYER_SPACESHIP_BOOSTED_PATH;
 import static main.com.github.fariadavi.utils.SpriteMappings.SPRITES_SHIPS_PLAYER_SPACESHIP_PATH;
@@ -111,11 +110,10 @@ public class Player extends Ship {
         if (turbo && tempoTurbo > 4) {
             tempoTurbo = 0;
             multiplicador = multiplicadorInicial;
-            ;
             setTurbo(false, tempoTurbo);
         }
 
-        if ((canvasPanel.key_states[KeyEvent.VK_SHIFT])) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_SHIFT)) {
             if (tempoTurbo > 20) {
                 tempoTurbo = 0;
                 multiplicador *= 2.2;
@@ -123,22 +121,22 @@ public class Player extends Ship {
             }
         }
 
-        if (canvasPanel.key_states[KeyEvent.VK_V] && frametimeTiro > 0.5) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_V) && frametimeTiro > 0.5) {
             tiroAtivo = true;
             frametimeTiro = 0;
         }
-        if (canvasPanel.key_states[KeyEvent.VK_B] && frametimeMissil > 1.5) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_B) && frametimeMissil > 1.5) {
             missilAtivo = true;
             frametimeMissil = 0;
         }
-        if ((canvasPanel.key_states[KeyEvent.VK_RIGHT]) && (px < 670)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_RIGHT) && px < 670) {
             px += multiplicador * dt;
-        } else if ((canvasPanel.key_states[KeyEvent.VK_LEFT]) && (px > -62)) {
+        } else if (canvasPanel.isKeyPressed(KeyEvent.VK_LEFT) && px > -62) {
             px -= multiplicador * dt;
         }
-        if ((canvasPanel.key_states[KeyEvent.VK_UP]) && (py > -50)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_UP) && py > -50) {
             py -= multiplicador * dt;
-        } else if ((canvasPanel.key_states[KeyEvent.VK_DOWN]) && (py < 490)) {
+        } else if (canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) && py < 490) {
             py += multiplicador * dt;
         }
     }

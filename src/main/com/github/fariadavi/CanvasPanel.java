@@ -1,25 +1,44 @@
 package main.com.github.fariadavi;
 
 import main.com.github.fariadavi.game.GameRun;
-import main.com.github.fariadavi.titlescreen.Titlescreen;
+import main.com.github.fariadavi.titlescreen.TitleScreen;
+import main.com.github.fariadavi.utils.InputManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CanvasPanel extends JPanel implements Runnable {
 
-    public final CanvasPanel canvasPanel = this;
+    private InputManager inputManager;
 
-    public boolean[] key_states = new boolean[256];
+    public boolean isKeyPressed(int keyCode) {
+        return this.inputManager.isKeyPressed(keyCode);
+    }
 
-    public Titlescreen titlescreen;
+    public void clearKeyPress(int keyCode) {
+        this.inputManager.clearKeyState(keyCode);
+    }
+
+    public boolean isMouseClicked() {
+        return this.inputManager.isMouseClicked();
+    }
+
+    public int[] getClickPosition() {
+        return this.inputManager.getClickPosition();
+    }
+
+    public void clearMouseClick() {
+        this.inputManager.clearClickPosition();
+    }
+
+    public int getClickedRectangleIndex(Rectangle... rectangles) {
+        return this.inputManager.getClickedRectangleIndex(rectangles);
+    }
+
+    public TitleScreen titlescreen;
     public GameRun gameRun;
 
     private boolean start = false;
@@ -58,84 +77,43 @@ public class CanvasPanel extends JPanel implements Runnable {
         }
     }
 
-    private class KeyboardAdapter extends KeyAdapter {
-        @Override
-        public void keyReleased(KeyEvent e) {
-            key_states[e.getKeyCode()] = false;
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            key_states[e.getKeyCode()] = true;
-        }
-    }
-
-    private class MouseAdapter implements MouseListener {
-        //where initialization occurs:
-        //Register for mouse events on blankArea and the panel.
-        @Override
-        public void mousePressed(MouseEvent e) {
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-//            if (!start) {
-//                if (rectNewGame.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//                else if (rectRecords.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//                else if (rectCredits.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//                else if (rectQuit.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//            }
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-//            if (!start) {
-//                if (rectNewGame.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//                else if (rectRecords.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//                else if (rectCredits.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//                else if (rectQuit.contains(e.getX(), e.getY()))
-//                    System.out.println("ENTROU");
-//            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (!start) {
-                titlescreen.handleMouseClick(e, canvasPanel);
-            }
-        }
-    }
-
     private void load() {
         setBackground(Color.BLACK);
-        addKeyListener(new KeyboardAdapter());
-        addMouseListener(new MouseAdapter());
 
-        titlescreen = new Titlescreen();
-        gameRun = new GameRun();
+        this.inputManager = new InputManager();
+        addKeyListener(inputManager.getKeyboardAdapter());
+        addMouseListener(inputManager.getMouseAdapter());
+
+        this.titlescreen = new TitleScreen();
+        this.gameRun = new GameRun();
     }
 
-    public void goBack() {
-        start = false;
-        titlescreen.show();
-//        gameRun.resetPlayer();
-//        player.setPos(80, 280);
-    }
-
-    public void newGame() {
+    public void startNewRun() {
         start = true;
         gameRun.start();
+    }
+
+    public void showScoreboard() {
+        if (start) return;
+
+        titlescreen.showScoreboard();
+    }
+
+    public void showCredits() {
+        if (start) return;
+
+        titlescreen.showCredits();
+    }
+
+    public void returnToTitleScreen() {
+        if (start) {
+            start = false;
+            titlescreen.reset();
+        } else {
+            titlescreen.reset();
+        }
+//        gameRun.resetPlayer();
+//        player.setPos(80, 280);
     }
 
     private void update(double dt) throws IOException {
