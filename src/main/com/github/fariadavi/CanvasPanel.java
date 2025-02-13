@@ -39,8 +39,6 @@ public class CanvasPanel extends JPanel implements Runnable {
     public TitleScreen titlescreen;
     public GameRun gameRun;
 
-    private boolean start = false;
-
     public CanvasPanel() {
         setDoubleBuffered(true);
         setFocusable(true);
@@ -79,66 +77,72 @@ public class CanvasPanel extends JPanel implements Runnable {
         setBackground(Color.BLACK);
 
         this.inputManager = new InputManager();
-        addKeyListener(inputManager.getKeyboardAdapter());
-        addMouseListener(inputManager.getMouseAdapter());
+        addKeyListener(this.inputManager.getKeyboardAdapter());
+        addMouseListener(this.inputManager.getMouseAdapter());
 
         this.scoreManager = new ScoreManager();
 
         this.titlescreen = new TitleScreen();
-        this.gameRun = new GameRun();
-    }
-
-    public void startNewRun() {
-        start = true;
-        gameRun.start();
     }
 
     public void showScoreboard() {
-        if (start) return;
-
-        HighScore[] highScores = scoreManager.readScoreBoardFile();
-        titlescreen.showScoreboard(highScores);
+        HighScore[] highScores = this.scoreManager.readScoreBoardFile();
+        this.titlescreen.showScoreboard(highScores);
     }
 
     public void showCredits() {
-        if (start) return;
-
-        titlescreen.showCredits();
+        this.titlescreen.showCredits();
     }
 
-    public void returnToTitleScreen() {
-        if (start) {
-            start = false;
-            titlescreen.reset();
-        } else {
-            titlescreen.reset();
-        }
-//        gameRun.resetPlayer();
-//        player.setPos(80, 280);
+    public void resetTitleScreen() {
+        this.titlescreen.reset();
+    }
+
+    public void startNewGameRun() {
+        this.titlescreen = null;
+        this.gameRun = new GameRun();
+    }
+
+    public void finishGameRun() {
+        this.titlescreen = new TitleScreen();
+        this.gameRun = null;
+    }
+
+    public double getPlayerSpeed() {
+        return this.gameRun.getPlayerSpeed();
     }
 
     public int getLowestHighScore() {
-        return scoreManager.getLowestScoreFromFile();
+        return this.scoreManager.getLowestScoreFromFile();
     }
 
     public void addHighScore(String playerName, int score) {
-        scoreManager.addScoreToFile(new HighScore(playerName, score));
+        this.scoreManager.addScoreToFile(new HighScore(playerName, score));
     }
 
     private void update(double dt) throws IOException {
-        if (start) {
-            gameRun.update(dt, this);
-        } else {
-            titlescreen.update(dt, this);
+        if (this.titlescreen != null) {
+            this.titlescreen.update(dt, this);
+            return;
+        }
+
+        if (this.gameRun != null) {
+            this.gameRun.update(dt, this);
+            return;
         }
     }
 
     private void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        if (start) {
-            gameRun.draw(g2d);
-        } else {
-            titlescreen.draw(g2d);
+
+        if (this.titlescreen != null) {
+            this.titlescreen.draw(g2d);
+            return;
+        }
+
+        if (this.gameRun != null) {
+            this.gameRun.draw(g2d);
+            return;
         }
     }
 }

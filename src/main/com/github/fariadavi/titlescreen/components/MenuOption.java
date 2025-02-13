@@ -27,22 +27,22 @@ public class MenuOption extends CanvasImageComponent {
         this.isHighlighted = isHighlighted;
 
         String alternateImagePath = imageResourcePath.replaceFirst("\\.png", "_selected.png");
-        alternateImage = getImage(alternateImagePath);
+        this.alternateImage = getImage(alternateImagePath);
         setAlignmentX(ALIGNMENT_CENTER);
     }
 
     public boolean isHighlighted() {
-        return isHighlighted;
+        return this.isHighlighted;
     }
 
     public void setHighlighted(boolean highlighted) {
-        isHighlighted = highlighted;
+        this.isHighlighted = highlighted;
     }
 
     public void executeAction(CanvasPanel canvasPanel) {
         switch (menuAction) {
             case ACTION_NEWRUN:
-                canvasPanel.startNewRun();
+                canvasPanel.startNewGameRun();
                 break;
             case ACTION_HIGHSCORES:
                 canvasPanel.showScoreboard();
@@ -59,7 +59,7 @@ public class MenuOption extends CanvasImageComponent {
     @Override
     public void draw(Graphics2D g2d) {
         g2d.drawImage(
-                isHighlighted ? alternateImage : this.getComponentImage(),
+                this.isHighlighted ? this.alternateImage : this.getComponentImage(),
                 (int) this.getVisibleX(),
                 (int) this.getVisibleY(),
                 null

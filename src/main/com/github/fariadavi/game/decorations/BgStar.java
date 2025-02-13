@@ -1,57 +1,82 @@
 package main.com.github.fariadavi.game.decorations;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import main.com.github.fariadavi.CanvasComponent;
+import main.com.github.fariadavi.CanvasPanel;
+
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-public class BgStar {
-    private double px, py;
-    private boolean ativo;
-    private int cor, mult;
+import static main.com.github.fariadavi.MainFrame.WINDOW_HEIGHT;
+import static main.com.github.fariadavi.MainFrame.WINDOW_WIDTH;
+import static main.com.github.fariadavi.utils.Randomizer.randInt;
+
+public class BgStar extends CanvasComponent {
+
+    public static final int MIN_COLOR_VALUE = 40;
+    public static final int MAX_COLOR_VALUE = 255;
+
+    public static final int WIDTH = 3;
+    public static final int HEIGHT = 2;
+
+    private int color;
 
     public BgStar() {
-        px = randInt(0, 799);
-        py = randInt(0, 599);
+        super(randInt(0, WINDOW_WIDTH), randInt(0, WINDOW_HEIGHT), true);
+        this.color = randInt(MIN_COLOR_VALUE, MAX_COLOR_VALUE);
     }
 
-    public static int randInt(int min, int max) {
-        java.util.Random rand = new java.util.Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
-        return randomNum;
+    public int getColor() {
+        return this.color;
     }
 
-    public boolean ativo() {
-        return ativo;
+    public void respawn() {
+        this.color = randInt(MIN_COLOR_VALUE, MAX_COLOR_VALUE);
+        this.setPX(WINDOW_WIDTH - 1);
+        this.setPY(randInt(0, WINDOW_HEIGHT));
     }
 
-    public void ativar() {
-        cor = randInt(40, 255);
-        ativo = true;
+    private double getProximityMultiplier() {
+//        return Math.pow((this.color / 100d) + 1d, 2d);
+        return 1;
     }
 
-    public void desativar() {
-        ativo = false;
-        px = 810;
-        py = randInt(0, 599);
+    @Override
+    public boolean isVisible() {
+        double proximityMultiplier = getProximityMultiplier();
+
+        double starWidth = WIDTH * proximityMultiplier;
+        double starHeight = HEIGHT * proximityMultiplier;
+
+        double startX = this.getPX();
+        double endX = startX + starWidth;
+        double startY = this.getPY();
+        double endY = startY + starHeight;
+
+        return endX > 0 && endY > 0 && startX < WINDOW_WIDTH && startY < WINDOW_HEIGHT;
     }
 
-    public double getPX() {
-        return px;
-    }
+    public void update(double dt, CanvasPanel canvasPanel) {
+        if (!this.isActive()) return;
 
-    public double getPY() {
-        return py;
-    }
-
-    public void update(double dt, boolean turbo) {
-        mult = cor * 3;
-        if (turbo)
-            mult *= 2.2;
-        px -= mult * dt;
+        this.move(MOVE_DIRECTION_LEFT, dt, (int) (this.color * 3 * canvasPanel.getPlayerSpeed()));
     }
 
     public void draw(Graphics2D g2d) {
-        g2d.setColor(new Color(cor, cor, cor));
-        g2d.fill(new Rectangle2D.Double((int) px, (int) py, 3, 2));
+        if (!this.isActive()) return;
+
+        g2d.setColor(new Color(this.color, this.color, this.color));
+
+        double proximityMultiplier = getProximityMultiplier();
+        double starWidth = WIDTH * proximityMultiplier;
+        double starHeight = HEIGHT * proximityMultiplier;
+//        g2d.fill(new RoundRectangle2D.Double(
+        g2d.fill(new Rectangle2D.Double(
+                (int) this.getPX(),
+                (int) this.getPY(),
+                starWidth,
+//                starHeight,
+//                starWidth,
+                starHeight
+        ));
     }
 }

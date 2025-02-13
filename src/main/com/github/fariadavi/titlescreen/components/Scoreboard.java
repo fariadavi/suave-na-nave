@@ -20,13 +20,13 @@ public class Scoreboard extends CanvasGroupComponent {
     }
 
     public void updateHighScores(HighScore... updatedScoreList) {
-        for (int i = 0; i < highScores.length; i++) {
+        for (int i = 0; i < this.highScores.length; i++) {
             if (i >= updatedScoreList.length || updatedScoreList[i] == null) {
-                highScores[i] = null;
+                this.highScores[i] = null;
                 continue;
             }
 
-            highScores[i] = updatedScoreList[i];
+            this.highScores[i] = updatedScoreList[i];
         }
     }
 
@@ -41,7 +41,7 @@ public class Scoreboard extends CanvasGroupComponent {
         if (canvasPanel.isKeyPressed(KeyEvent.VK_ENTER)) {
             canvasPanel.clearKeyPress(KeyEvent.VK_ENTER);
 
-            canvasPanel.returnToTitleScreen();
+            canvasPanel.resetTitleScreen();
         }
 
         if (canvasPanel.isMouseClicked()) {
@@ -54,7 +54,7 @@ public class Scoreboard extends CanvasGroupComponent {
             ).contains(clickPosition[0], clickPosition[1]);
 
             if (clickedClose)
-                canvasPanel.returnToTitleScreen();
+                canvasPanel.resetTitleScreen();
 
             canvasPanel.clearMouseClick();
         }
@@ -76,8 +76,8 @@ public class Scoreboard extends CanvasGroupComponent {
         g2d.drawString("HIGH SCORES", (int) px + 56, (int) py + 70);
         g2d.setFont(new Font("Tahoma", Font.BOLD, 24));
 
-        for (int i = 0; i < highScores.length; i++) {
-            if (highScores[i] == null) continue;
+        for (int i = 0; i < this.highScores.length; i++) {
+            if (this.highScores[i] == null) continue;
 
             int x = (int) (px + 70);
             int y = (int) (py + 110 + 30 * i);
@@ -85,12 +85,12 @@ public class Scoreboard extends CanvasGroupComponent {
             FontMetrics fm = g2d.getFontMetrics();
             g2d.drawString(str, x - fm.stringWidth(str), y);
 
-            String name = highScores[i].getPlayerName();
+            String name = this.highScores[i].getPlayerName();
             if (name.length() > 10)
                 name = name.substring(0, 10) + "...";
             g2d.drawString(name, x + 10, y);
 
-            String score = String.valueOf(highScores[i].getScore());
+            String score = String.valueOf(this.highScores[i].getScore());
             g2d.drawString(score, x + 230 - fm.stringWidth(score), y);
         }
 

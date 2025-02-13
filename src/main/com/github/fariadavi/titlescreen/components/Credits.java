@@ -17,6 +17,6 @@ public class Credits extends CanvasImageComponent {
         this.move(MOVE_DIRECTION_UP, dt, 200);
 
         if (!this.isVisible())
-            canvasPanel.returnToTitleScreen();
+            canvasPanel.resetTitleScreen();
     }
 }

@@ -25,6 +25,11 @@ public abstract class Ship {
             explosao[i] = FileHelper.getImage("sprites/explosion/" + (i + 1) + ".png");
     }
 
+    public double getSpeed() {
+        // TODO return this.speed;
+        return 1;
+    }
+
     public static int randInt(int min, int max) {
         java.util.Random rand = new java.util.Random();
         int randomNum = rand.nextInt((max - min) + 1) + min;

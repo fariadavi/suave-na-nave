@@ -1,12 +1,11 @@
 package main.com.github.fariadavi.game;
 
 import main.com.github.fariadavi.CanvasPanel;
-import main.com.github.fariadavi.game.decorations.BgStar;
+import main.com.github.fariadavi.game.decorations.GameBackground;
 import main.com.github.fariadavi.game.items.MissileDrop;
 import main.com.github.fariadavi.game.ships.*;
 import main.com.github.fariadavi.game.shots.MissileShot;
 import main.com.github.fariadavi.game.shots.RegularShot;
-import main.com.github.fariadavi.utils.FileHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +16,7 @@ import static main.com.github.fariadavi.utils.SpriteMappings.*;
 
 public class GameRun {
 
+    private final GameBackground background;
     private Player player;
 
     private RedUFO[] redUFO = new RedUFO[16];
@@ -29,17 +29,14 @@ public class GameRun {
 
     private MissileDrop[] missilMissileDrop = new MissileDrop[64];
 
-    private BgStar[] estrelas = new BgStar[300];
-
     private Image gui_vidas, gui_misseis, gameOver;
-    //    private boolean chargeMissil = false, pressed = false;
     private double[] deltaInimigos = new double[64];
     private int[] posInimigos = new int[64];
-    private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, tamPontuacao, ptsAsomar = 0, posMenuHighlited = 0;
+    private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, tamPontuacao, ptsAsomar = 0;
     private double cargaTurbo = 0, cargaMissil = 0,
-            frametimeEstrelas = 0, frametimeMissel = 0, frametimeRespawnRedUFO = 2, frametimeRespawnGreenFire = 3.8,
+            frametimeMissel = 0, frametimeRespawnRedUFO = 2, frametimeRespawnGreenFire = 3.8,
             frametimeRespawnBigBang = 5.8, frametimeRespawnDeathFish = 7.8, frametimeTurbo = 0, frametimeExplosao = 0,
-            frametimeInvulneravel = 10, frametimeSomaPts = 0, frametimeGameOver = 0, frametimeEnter = 2;
+            frametimeInvulneravel = 10, frametimeSomaPts = 0, frametimeGameOver = 0;
 
 
     private Font fontePontos = new Font("Verdana", Font.PLAIN, 48);
@@ -49,17 +46,8 @@ public class GameRun {
         return ((x1 < x2 + w2) && (x2 < x1 + w1) && (y1 < y2 + h2) && (y2 < y1 + h1));
     }
 
-    public void start() {
-        player.spawn(80, 220);
-        for (int i = 0; i < 16; i++) {
-            redUFO[i].die();
-            greenFire[i].die();
-            bigBang[i].die();
-            deathFish[i].die();
-        }
-    }
-
     public GameRun() {
+        this.background = new GameBackground();
         player = new Player();
         gui_vidas = getImage(SPRITE_UI_HEALTH_INDICATOR_PATH);
         gui_misseis = getImage(SPRITE_UI_MISSILES_INDICATOR_PATH);
@@ -78,17 +66,15 @@ public class GameRun {
 
         for (int i = 0; i < 64; i++)
             missilMissileDrop[i] = new MissileDrop(SPRITE_ITEMS_DROPPEDMISSILE_PATH);
+    }
 
-        // for estrelas load
-        for (int i = 0; i < 300; i++) {
-            estrelas[i] = new BgStar();
-            if (!estrelas[i].ativo()) {
-                estrelas[i].ativar();
-            }
-        }
+    public double getPlayerSpeed() {
+        return this.player.getSpeed();
     }
 
     public void update(double dt, CanvasPanel canvasPanel) {
+        this.background.update(dt, canvasPanel);
+
         frametimeSomaPts += dt;
         if (ptsAsomar > 0 && frametimeSomaPts > 0.02) {
             player.addPts();
@@ -98,7 +84,6 @@ public class GameRun {
         if (player.getVidas() > -1) {
             player.update(dt, canvasPanel);
             frametimeTurbo += dt;
-            frametimeEstrelas += dt;
             frametimeMissel += dt;
 
             posReturnPadrao = 0;
@@ -160,21 +145,6 @@ public class GameRun {
                 }
             }
 
-            // for estrelas
-            for (int i = 0; i < 300; i++) {
-                if (frametimeEstrelas > 0.01) {
-                    if (!estrelas[i].ativo()) {
-                        estrelas[i].ativar();
-                        frametimeEstrelas = 0;
-                        break;
-                    }
-                }
-                if (estrelas[i].ativo()) {
-                    estrelas[i].update(dt, player.getTurbo());
-                    if (estrelas[i].getPX() < 0)
-                        estrelas[i].desativar();
-                }
-            }
             // for Tiros Simples
             for (int i = 0; i < 16; i++) {
                 if (player.getTiro()) {
@@ -479,17 +449,15 @@ public class GameRun {
                     canvasPanel.addHighScore(playerName, player.getPontos());
                 }
 
-                canvasPanel.returnToTitleScreen();
+                canvasPanel.finishGameRun();
             }
         }
     }
 
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        for (int i = 0; i < 300; i++) {                                             // DESENHA ESTRELAS
-            if (estrelas[i].ativo())
-                estrelas[i].draw(g2d);
-        }
+        this.background.draw(g2d);
+
         for (int i = 0; i < 16; i++) {                                               // DESENHA TIROS SIMPLES PLAYER
             if (tiros[i].ativo())
                 tiros[i].draw(g2d);
