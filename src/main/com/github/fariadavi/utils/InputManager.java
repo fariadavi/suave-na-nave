@@ -1,6 +1,5 @@
 package main.com.github.fariadavi.utils;
 
-import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -91,14 +90,5 @@ public class InputManager {
     public void clearClickPosition() {
         clickPosition[0] = 0;
         clickPosition[1] = 0;
-    }
-
-    public int getClickedRectangleIndex(Rectangle... rectangles) {
-        for (int i = 0; i < rectangles.length; i++) {
-            if (rectangles[i].contains(clickPosition[0], clickPosition[1]))
-                return i;
-        }
-
-        return -1;
     }
 }

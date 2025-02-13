@@ -2,37 +2,32 @@ package main.com.github.fariadavi.titlescreen.components;
 
 import main.com.github.fariadavi.CanvasGroupComponent;
 import main.com.github.fariadavi.CanvasPanel;
-import main.com.github.fariadavi.utils.FileHelper;
+import main.com.github.fariadavi.HighScore;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
+import static main.com.github.fariadavi.ScoreManager.NUM_HIGHSCORES;
+
 public class Scoreboard extends CanvasGroupComponent {
 
-    private final String[] names = new String[10];
-    private final int[] scores = new int[10];
-
-    private final Rectangle closeScoreboard;
+    private final HighScore[] highScores = new HighScore[NUM_HIGHSCORES];
 
     public Scoreboard(int x, int y) {
         super(x, y, false);
-
-        closeScoreboard = new Rectangle(x + 120, y + 400, 110, 40);
     }
 
-    @Override
-    public void activate() {
-        super.activate();
+    public void updateHighScores(HighScore... updatedScoreList) {
+        for (int i = 0; i < highScores.length; i++) {
+            if (i >= updatedScoreList.length || updatedScoreList[i] == null) {
+                highScores[i] = null;
+                continue;
+            }
 
-        String[] fileNames = FileHelper.getNomes();
-        for (int i = 0; i < fileNames.length; i++)
-            names[i] = fileNames[i];
-
-        int[] fileScores = FileHelper.getPts();
-        for (int i = 0; i < fileScores.length; i++)
-            scores[i] = fileScores[i];
+            highScores[i] = updatedScoreList[i];
+        }
     }
 
     public void update(double dt, CanvasPanel canvasPanel) {
@@ -40,7 +35,6 @@ public class Scoreboard extends CanvasGroupComponent {
 
         if (this.getPY() > 80) {
             this.move(MOVE_DIRECTION_UP, dt, 180);
-            closeScoreboard.setLocation((int) this.getPX() + 120, (int) this.getPY() + 400);
             return;
         }
 
@@ -50,19 +44,27 @@ public class Scoreboard extends CanvasGroupComponent {
             canvasPanel.returnToTitleScreen();
         }
 
-        if (canvasPanel.isMouseClicked() &&
-                canvasPanel.getClickedRectangleIndex(closeScoreboard) == 0) {
-            canvasPanel.clearMouseClick();
+        if (canvasPanel.isMouseClicked()) {
+            int[] clickPosition = canvasPanel.getClickPosition();
+            boolean clickedClose = new Rectangle(
+                    (int) this.getPX() + 120,
+                    (int) this.getPY() + 400,
+                    110,
+                    40
+            ).contains(clickPosition[0], clickPosition[1]);
 
-            canvasPanel.returnToTitleScreen();
+            if (clickedClose)
+                canvasPanel.returnToTitleScreen();
+
+            canvasPanel.clearMouseClick();
         }
     }
 
     public void draw(Graphics2D g2d) {
-        if (!super.isActive()) return;
+        if (!this.isActive()) return;
 
-        double px = super.getPX();
-        double py = super.getPY();
+        double px = this.getPX();
+        double py = this.getPY();
         g2d.setPaint(new GradientPaint((float) px, (float) py, Color.black, (float) px, (float) py + 400, Color.lightGray));
         g2d.fill(new RoundRectangle2D.Double(px, py, 350, 420, 50, 50));
         g2d.setColor(Color.black);
@@ -71,12 +73,27 @@ public class Scoreboard extends CanvasGroupComponent {
         g2d.fill(new Rectangle2D.Double(px + 120, py + 400, 110, 40));
         g2d.setColor(new Color(254, 233, 0, 250));
         g2d.setFont(new Font("Tahoma", Font.BOLD, 36));
-        g2d.drawString("HIGH SCORES", (int) px + 48, (int) py + 70);
+        g2d.drawString("HIGH SCORES", (int) px + 56, (int) py + 70);
         g2d.setFont(new Font("Tahoma", Font.BOLD, 24));
-        for (int i = 0, h = (int) py + 110; i < 10; i++, h += 30) {
-            g2d.drawString(names[i] + " ", (int) px + 80, h);
-            g2d.drawString(" " + scores[i], (int) px + 230, h);
+
+        for (int i = 0; i < highScores.length; i++) {
+            if (highScores[i] == null) continue;
+
+            int x = (int) (px + 70);
+            int y = (int) (py + 110 + 30 * i);
+            String str = String.valueOf(i + 1);
+            FontMetrics fm = g2d.getFontMetrics();
+            g2d.drawString(str, x - fm.stringWidth(str), y);
+
+            String name = highScores[i].getPlayerName();
+            if (name.length() > 10)
+                name = name.substring(0, 10) + "...";
+            g2d.drawString(name, x + 10, y);
+
+            String score = String.valueOf(highScores[i].getScore());
+            g2d.drawString(score, x + 230 - fm.stringWidth(score), y);
         }
+
         g2d.setColor(Color.black);
         g2d.draw(new Rectangle2D.Double(px + 120, py + 400, 110, 40));
         g2d.drawString("CLOSE", (int) px + 136, (int) py + 430);

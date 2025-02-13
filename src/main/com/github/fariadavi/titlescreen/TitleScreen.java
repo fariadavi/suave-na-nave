@@ -2,10 +2,8 @@ package main.com.github.fariadavi.titlescreen;
 
 import main.com.github.fariadavi.CanvasGroupComponent;
 import main.com.github.fariadavi.CanvasPanel;
-import main.com.github.fariadavi.titlescreen.components.Menu;
+import main.com.github.fariadavi.HighScore;
 import main.com.github.fariadavi.titlescreen.components.*;
-
-import java.awt.*;
 
 public class TitleScreen extends CanvasGroupComponent {
 
@@ -29,7 +27,8 @@ public class TitleScreen extends CanvasGroupComponent {
         setComponents(background, title, mockPlayer, menu, scoreboard, credits);
     }
 
-    public void showScoreboard() {
+    public void showScoreboard(HighScore... updatedScoreList) {
+        scoreboard.updateHighScores(updatedScoreList);
         scoreboard.activate();
     }
 
@@ -41,11 +40,10 @@ public class TitleScreen extends CanvasGroupComponent {
         if (!super.isActive()) return;
 
         background.update(dt, canvasPanel);
-        menu.update(dt, canvasPanel);
-        scoreboard.update(dt, canvasPanel);
-        credits.update(dt, canvasPanel);
 
         if (scoreboard.isActive()) {
+            scoreboard.update(dt, canvasPanel);
+
             if (menu.isVisible())
                 menu.move(MOVE_DIRECTION_RIGHT, dt, 320);
             else
@@ -55,9 +53,13 @@ public class TitleScreen extends CanvasGroupComponent {
                 title.move(MOVE_DIRECTION_UP, dt, 170);
             else
                 title.deactivate();
+
+            return;
         }
 
         if (credits.isActive()) {
+            credits.update(dt, canvasPanel);
+
             if (menu.isVisible())
                 menu.move(MOVE_DIRECTION_RIGHT, dt, 200);
             else
@@ -67,6 +69,10 @@ public class TitleScreen extends CanvasGroupComponent {
                 title.move(MOVE_DIRECTION_UP, dt, 170);
             else
                 title.deactivate();
+
+            return;
         }
+
+        menu.update(dt, canvasPanel);
     }
 }

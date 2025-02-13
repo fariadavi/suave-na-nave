@@ -468,17 +468,15 @@ public class GameRun {
         } else {
             frametimeGameOver += dt;
             if (frametimeGameOver >= 1 && frametimeGameOver < 1 + dt) {
-                String nomeEntrado = null;
-//                testee = FileHelper.le();
-                if (player.getPontos() > FileHelper.le()) {
-                    while (nomeEntrado == null || nomeEntrado.equals("")) {
-                        nomeEntrado = JOptionPane.showInputDialog(null, "Insira o seu nome", "High Score", JOptionPane.PLAIN_MESSAGE);
-                        if (nomeEntrado == null || nomeEntrado.equals("")) {
+                String playerName = null;
+                if (player.getPontos() > canvasPanel.getLowestHighScore()) {
+                    while (playerName == null || playerName.isEmpty()) {
+                        playerName = JOptionPane.showInputDialog(null, "Insira o seu nome", "High Score", JOptionPane.PLAIN_MESSAGE);
+                        if (playerName == null || playerName.isEmpty()) {
                             JOptionPane.showMessageDialog(null, "Entre um nome");
                         }
                     }
-                    FileHelper.escreve(nomeEntrado, player.getPontos());
-//                        recordes=true;
+                    canvasPanel.addHighScore(playerName, player.getPontos());
                 }
 
                 canvasPanel.returnToTitleScreen();

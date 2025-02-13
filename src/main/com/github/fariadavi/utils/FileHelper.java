@@ -1,133 +1,56 @@
 package main.com.github.fariadavi.utils;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 import java.net.URL;
 
+import static main.com.github.fariadavi.ScoreManager.NUM_HIGHSCORES;
+
 public class FileHelper {
+
+    public static final String RESOURCES_PATH = "main/resources/";
+
     public static Image getImage(String imagePath) {
         return new ImageIcon(getResource(imagePath)).getImage();
     }
 
-    public static URL getResource(String path) {
-        return FileHelper.class.getClassLoader().getResource("main/resources/" + path);
+    private static URL getResource(String path) {
+        return FileHelper.class.getClassLoader().getResource(RESOURCES_PATH + path);
     }
 
-    public static void escreve(String nomeEntrado, int pts) {
-        BufferedWriter file;
+    private static InputStream getResourceAsStream(String path) {
+        return FileHelper.class.getClassLoader().getResourceAsStream(RESOURCES_PATH + path);
+    }
+
+    public static void writeFile(String filePath, String contents) {
         try {
-            file = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("highscores.dat", true)));
-            file.append(nomeEntrado + "|" + pts + "\n");
-            file.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Erro: " + ex.getMessage());
+            FileWriter fileWriter = new FileWriter(getResource(filePath).getPath());
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(contents);
+            bufferedWriter.close();
         } catch (IOException ex) {
-            System.out.println("Erro: " + ex.getMessage());
+            System.out.println("error: " + ex.getMessage());
         }
     }
 
-    public static int le() {
-        int i = 0, menorValor = 0;
-        String[] nomes = new String[20];
-        int[] pontos = new int[20];
+    public static String[] readFile(String filePath) {
+        String[] scores = new String[NUM_HIGHSCORES];
 
-        BufferedReader fileread;
-        try {
-            fileread = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.dat")));
-            String linha;
-            while ((linha = fileread.readLine()) != null) {
-                System.out.println(linha);
-                nomes[i] = linha.substring(0, linha.indexOf('|'));
-                pontos[i] = Integer.parseInt(linha.substring(linha.indexOf('|') + 1, linha.length()));
-                i++;
-            }
-            menorValor = pontos[9];
-            fileread.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Erro: " + ex.getMessage());
-        } catch (IOException ex) {
-            System.out.println("Erro: " + ex.getMessage());
-        }
-        return menorValor;
-    }
-
-    public static String[] getNomes() {
         int i = 0;
-        String[] nomes = new String[10];
-        int[] pontos = new int[10];
-        BufferedReader fileread;
         try {
-            fileread = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.dat")));
-            String linha;
-            while ((linha = fileread.readLine()) != null) {
-                nomes[i] = linha.substring(0, linha.indexOf('|'));
-                pontos[i] = Integer.parseInt(linha.substring(linha.indexOf('|') + 1, linha.length()));
-            }
-            fileread.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Erro: " + ex.getMessage());
+            InputStream resourceAsStream = getResourceAsStream(filePath);
+            InputStreamReader streamReader = new InputStreamReader(resourceAsStream);
+            BufferedReader bufferedReader = new BufferedReader(streamReader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null && i < NUM_HIGHSCORES)
+                scores[i++] = line;
+
+            bufferedReader.close();
         } catch (IOException ex) {
-            System.out.println("Erro: " + ex.getMessage());
+            System.out.println("error: " + ex.getMessage());
         }
-        return nomes;
+
+        return scores;
     }
-
-    public static int[] getPts() {
-        int contador = 0;
-        String[] nomes;
-        int[] pontos = null;
-        BufferedReader fileread;
-        try {
-            fileread = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.dat")));
-            String linha;
-            while ((linha = fileread.readLine()) != null) {
-                contador++;
-            }
-            nomes = new String[contador];
-            pontos = new int[contador];
-            for (int i = 0; i < contador; i++) {
-                if ((linha = fileread.readLine()) != null) {
-                    nomes[i] = linha.substring(0, linha.indexOf('|'));
-                    pontos[i] = Integer.parseInt(linha.substring(linha.indexOf('|') + 1, linha.length()));
-                }
-            }
-            fileread.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Erro: " + ex.getMessage());
-        } catch (IOException ex) {
-            System.out.println("Erro: " + ex.getMessage());
-        }
-        return pontos;
-    }
-
-    public static void leitura() {
-        int i = 0;
-        String[] nomes = new String[20];
-        int[] pontos = new int[20];
-
-        BufferedReader fileread;
-        try {
-            fileread = new BufferedReader(new InputStreamReader(new FileInputStream("highscores.dat")));
-            String linha;
-            while ((linha = fileread.readLine()) != null) {
-                nomes[i] = linha.substring(0, linha.indexOf('|'));
-                pontos[i] = Integer.parseInt(linha.substring(linha.indexOf('|') + 1, linha.length()));
-                i++;
-            }
-            fileread.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Erro: " + ex.getMessage());
-        } catch (IOException ex) {
-            System.out.println("Erro: " + ex.getMessage());
-        }
-    }
-
 }

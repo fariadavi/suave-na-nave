@@ -34,9 +34,7 @@ public class CanvasPanel extends JPanel implements Runnable {
         this.inputManager.clearClickPosition();
     }
 
-    public int getClickedRectangleIndex(Rectangle... rectangles) {
-        return this.inputManager.getClickedRectangleIndex(rectangles);
-    }
+    public ScoreManager scoreManager;
 
     public TitleScreen titlescreen;
     public GameRun gameRun;
@@ -84,6 +82,8 @@ public class CanvasPanel extends JPanel implements Runnable {
         addKeyListener(inputManager.getKeyboardAdapter());
         addMouseListener(inputManager.getMouseAdapter());
 
+        this.scoreManager = new ScoreManager();
+
         this.titlescreen = new TitleScreen();
         this.gameRun = new GameRun();
     }
@@ -96,7 +96,8 @@ public class CanvasPanel extends JPanel implements Runnable {
     public void showScoreboard() {
         if (start) return;
 
-        titlescreen.showScoreboard();
+        HighScore[] highScores = scoreManager.readScoreBoardFile();
+        titlescreen.showScoreboard(highScores);
     }
 
     public void showCredits() {
@@ -114,6 +115,14 @@ public class CanvasPanel extends JPanel implements Runnable {
         }
 //        gameRun.resetPlayer();
 //        player.setPos(80, 280);
+    }
+
+    public int getLowestHighScore() {
+        return scoreManager.getLowestScoreFromFile();
+    }
+
+    public void addHighScore(String playerName, int score) {
+        scoreManager.addScoreToFile(new HighScore(playerName, score));
     }
 
     private void update(double dt) throws IOException {
