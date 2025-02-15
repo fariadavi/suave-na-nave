@@ -11,8 +11,14 @@ import static main.com.github.fariadavi.utils.SpriteMappings.SPRITES_SHIPS_PLAYE
 import static main.com.github.fariadavi.utils.SpriteMappings.SPRITES_SHIPS_PLAYER_SPACESHIP_PATH;
 
 public class Player extends Ship {
+
+    public static final double TURBO_RECHARGE_DURATION_SECONDS = 20;
+    public static final double TURBO_CONSUME_DURATION_SECONDS = 4;
+
+    public static final double MISSILE_COOLDOWN_DURATION_SECONDS = 1.5;
+
     private Image spriteNaveBoosted;
-    double frametimeTiro = 0, frametimeMissil = 0, frametimePontos = 0;
+    double frametimeTiro = 0, frametimeMissil = MISSILE_COOLDOWN_DURATION_SECONDS;
     private int pontos = 0, misseis = 3;
     private boolean missilAtivo, tiroAtivo;
 
@@ -22,6 +28,14 @@ public class Player extends Ship {
         px = 80;
         py = 280;
         spawn(px, py);
+    }
+
+    public double getMissileCooldownPercentage() {
+        return this.frametimeMissil / MISSILE_COOLDOWN_DURATION_SECONDS;
+    }
+
+    public double getTurboChargePercentage() {
+        return this.tempoTurbo / TURBO_RECHARGE_DURATION_SECONDS;
     }
 
     public void setPos(double posx, double posy) {
@@ -102,32 +116,45 @@ public class Player extends Ship {
 
     public void update(double dt, CanvasPanel canvasPanel) {
         frametimeTiro += dt;
-        frametimeMissil += dt;
-        tempoTurbo += dt;
         tiroAtivo = false;
-        missilAtivo = false;
 
-        if (turbo && tempoTurbo > 4) {
-            tempoTurbo = 0;
-            multiplicador = multiplicadorInicial;
-            setTurbo(false, tempoTurbo);
+        if (misseis > 0 && misseis <= 3) {
+            if (missilAtivo)
+                missilAtivo = false;
+
+            if (frametimeMissil < MISSILE_COOLDOWN_DURATION_SECONDS) {
+                frametimeMissil += dt;
+            } else if (frametimeMissil > MISSILE_COOLDOWN_DURATION_SECONDS) {
+                frametimeMissil = MISSILE_COOLDOWN_DURATION_SECONDS;
+            } else if (canvasPanel.isKeyPressed(KeyEvent.VK_B)) {
+                frametimeMissil = 0;
+                missilAtivo = true;
+            }
         }
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_SHIFT)) {
-            if (tempoTurbo > 20) {
-                tempoTurbo = 0;
+        if (!turbo) {
+            if (tempoTurbo < TURBO_RECHARGE_DURATION_SECONDS)
+                tempoTurbo += dt;
+            else if (tempoTurbo > TURBO_RECHARGE_DURATION_SECONDS)
+                tempoTurbo = TURBO_RECHARGE_DURATION_SECONDS;
+            else if (canvasPanel.isKeyPressed(KeyEvent.VK_SHIFT)) {
                 multiplicador *= 2.2;
                 setTurbo(true, tempoTurbo);
+            }
+        } else {
+            if (tempoTurbo > 0) {
+                double consumeMultiplier = TURBO_RECHARGE_DURATION_SECONDS / TURBO_CONSUME_DURATION_SECONDS;
+                tempoTurbo -= dt * consumeMultiplier;
+            } else {
+                tempoTurbo = 0;
+                multiplicador = multiplicadorInicial;
+                setTurbo(false, tempoTurbo);
             }
         }
 
         if (canvasPanel.isKeyPressed(KeyEvent.VK_V) && frametimeTiro > 0.5) {
             tiroAtivo = true;
             frametimeTiro = 0;
-        }
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_B) && frametimeMissil > 1.5) {
-            missilAtivo = true;
-            frametimeMissil = 0;
         }
         if (canvasPanel.isKeyPressed(KeyEvent.VK_RIGHT) && px < 670) {
             px += multiplicador * dt;

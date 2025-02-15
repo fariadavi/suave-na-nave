@@ -16,8 +16,8 @@ public class SpriteMappings {
     public static final String SPRITE_BG_TITLESCREEN_PATH = "sprites/ui/titlescreen_bg%i%.png";
 
     // IN GAME IMAGE PATHS
-    public static final String SPRITE_UI_HEALTH_INDICATOR_PATH = "sprites/ui/gui_spaceship.png";
-    public static final String SPRITE_UI_MISSILES_INDICATOR_PATH = "sprites/ui/gui_missile.png";
+    public static final String SPRITE_UI_LIFE_INDICATOR_PATH = "sprites/ui/gui_spaceship.png";
+    public static final String SPRITE_UI_MISSILE_INDICATOR_PATH = "sprites/ui/gui_missile.png";
     public static final String SPRITE_ITEMS_DROPPEDMISSILE_PATH = "sprites/items/dropped_missile.png";
     public static final String SPRITE_TEXTS_GAMEOVER_PATH = "sprites/texts/gameover.png";
 

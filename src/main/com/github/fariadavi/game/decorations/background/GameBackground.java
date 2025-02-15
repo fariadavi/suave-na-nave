@@ -1,4 +1,4 @@
-package main.com.github.fariadavi.game.decorations;
+package main.com.github.fariadavi.game.decorations.background;
 
 import main.com.github.fariadavi.CanvasGroupComponent;
 import main.com.github.fariadavi.CanvasPanel;

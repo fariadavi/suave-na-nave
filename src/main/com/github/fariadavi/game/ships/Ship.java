@@ -25,6 +25,10 @@ public abstract class Ship {
             explosao[i] = FileHelper.getImage("sprites/explosion/" + (i + 1) + ".png");
     }
 
+    public double[] getPosition() {
+        return new double[]{this.px, this.py};
+    }
+
     public double getSpeed() {
         // TODO return this.speed;
         return 1;

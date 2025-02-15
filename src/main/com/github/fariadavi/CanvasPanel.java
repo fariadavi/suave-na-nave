@@ -108,6 +108,34 @@ public class CanvasPanel extends JPanel implements Runnable {
         this.gameRun = null;
     }
 
+    public double[] getPlayerPosition() {
+        return this.gameRun.getPlayerPosition();
+    }
+
+    public int getPlayerLives() {
+        return this.gameRun.getPlayerLives();
+    }
+
+    public int getPlayerMissileCharges() {
+        return this.gameRun.getPlayerMissileCharges();
+    }
+
+    public double getPlayerMissileCooldownPercentage() {
+        return this.gameRun.getPlayerMissileCooldownPercentage();
+    }
+
+    public boolean isPlayerTurboActive() {
+        return this.gameRun.isPlayerTurboActive();
+    }
+
+    public double getPlayerTempoTurbo() {
+        return this.gameRun.getPlayerTempoTurbo();
+    }
+
+    public double getPlayerTurboChargePercentage() {
+        return this.gameRun.getPlayerTurboChargePercentage();
+    }
+
     public double getPlayerSpeed() {
         return this.gameRun.getPlayerSpeed();
     }

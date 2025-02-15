@@ -1,7 +1,8 @@
 package main.com.github.fariadavi.game;
 
 import main.com.github.fariadavi.CanvasPanel;
-import main.com.github.fariadavi.game.decorations.GameBackground;
+import main.com.github.fariadavi.game.decorations.background.GameBackground;
+import main.com.github.fariadavi.game.decorations.hud.HeadsUpDisplay;
 import main.com.github.fariadavi.game.items.MissileDrop;
 import main.com.github.fariadavi.game.ships.*;
 import main.com.github.fariadavi.game.shots.MissileShot;
@@ -16,7 +17,11 @@ import static main.com.github.fariadavi.utils.SpriteMappings.*;
 
 public class GameRun {
 
+    public static final int MAX_HEALTH = 3;
+    public static final int MAX_MISSILES = 3;
+
     private final GameBackground background;
+    private final HeadsUpDisplay hud;
     private Player player;
 
     private RedUFO[] redUFO = new RedUFO[16];
@@ -29,18 +34,17 @@ public class GameRun {
 
     private MissileDrop[] missilMissileDrop = new MissileDrop[64];
 
-    private Image gui_vidas, gui_misseis, gameOver;
+    private Image gameOver;
     private double[] deltaInimigos = new double[64];
     private int[] posInimigos = new int[64];
     private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, tamPontuacao, ptsAsomar = 0;
-    private double cargaTurbo = 0, cargaMissil = 0,
-            frametimeMissel = 0, frametimeRespawnRedUFO = 2, frametimeRespawnGreenFire = 3.8,
-            frametimeRespawnBigBang = 5.8, frametimeRespawnDeathFish = 7.8, frametimeTurbo = 0, frametimeExplosao = 0,
+    private double
+            frametimeRespawnRedUFO = 2, frametimeRespawnGreenFire = 3.8,
+            frametimeRespawnBigBang = 5.8, frametimeRespawnDeathFish = 7.8, frametimeExplosao = 0,
             frametimeInvulneravel = 10, frametimeSomaPts = 0, frametimeGameOver = 0;
 
 
     private Font fontePontos = new Font("Verdana", Font.PLAIN, 48);
-    private Font fonteTxt = new Font("Verdana", Font.BOLD, 14);
 
     private boolean CheckBoxCollision(double x1, double y1, double w1, double h1, double x2, double y2, double w2, double h2) {
         return ((x1 < x2 + w2) && (x2 < x1 + w1) && (y1 < y2 + h2) && (y2 < y1 + h1));
@@ -48,9 +52,8 @@ public class GameRun {
 
     public GameRun() {
         this.background = new GameBackground();
+        this.hud = new HeadsUpDisplay(MAX_HEALTH, MAX_MISSILES);
         player = new Player();
-        gui_vidas = getImage(SPRITE_UI_HEALTH_INDICATOR_PATH);
-        gui_misseis = getImage(SPRITE_UI_MISSILES_INDICATOR_PATH);
         gameOver = getImage(SPRITE_TEXTS_GAMEOVER_PATH);
 
         for (int i = 0; i < 16; i++) {
@@ -68,12 +71,42 @@ public class GameRun {
             missilMissileDrop[i] = new MissileDrop(SPRITE_ITEMS_DROPPEDMISSILE_PATH);
     }
 
+    public double[] getPlayerPosition() {
+        return this.player.getPosition();
+    }
+
+    public int getPlayerLives() {
+        return this.player.getVidas();
+    }
+
+    public int getPlayerMissileCharges() {
+        return this.player.getNumMisseis();
+    }
+
+    public double getPlayerMissileCooldownPercentage() {
+//        return this.cargaMissil / 50;
+        return this.player.getMissileCooldownPercentage();
+    }
+
+    public boolean isPlayerTurboActive() {
+        return this.player.getTurbo();
+    }
+
+    public double getPlayerTempoTurbo() {
+        return this.player.getTempoTurbo();
+    }
+
+    public double getPlayerTurboChargePercentage() {
+        return this.player.getTurboChargePercentage();
+    }
+
     public double getPlayerSpeed() {
         return this.player.getSpeed();
     }
 
     public void update(double dt, CanvasPanel canvasPanel) {
         this.background.update(dt, canvasPanel);
+        this.hud.update(dt, canvasPanel);
 
         frametimeSomaPts += dt;
         if (ptsAsomar > 0 && frametimeSomaPts > 0.02) {
@@ -83,8 +116,6 @@ public class GameRun {
         }
         if (player.getVidas() > -1) {
             player.update(dt, canvasPanel);
-            frametimeTurbo += dt;
-            frametimeMissel += dt;
 
             posReturnPadrao = 0;
 
@@ -126,23 +157,6 @@ public class GameRun {
                 greenFire[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
                 bigBang[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
                 deathFish[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
-            }
-
-            if (!player.getTurbo() && frametimeTurbo > 0.05 && cargaTurbo < 147) {   //CARGA TURBO
-                cargaTurbo += 0.37;
-                frametimeTurbo = 0;
-            } else if (player.getTurbo() && frametimeTurbo > 0.01) {
-                cargaTurbo -= 0.37;
-                frametimeTurbo = 0;
-            }
-
-            if (player.getNumMisseis() > 0 && player.getNumMisseis() <= 3) {          //CARGA MISSEL
-                if (player.getMissil()) {
-                    cargaMissil = 0;
-                } else if (frametimeMissel > 0.01 && cargaMissil < 50) {
-                    cargaMissil += 0.36;
-                    frametimeMissel = 0;
-                }
             }
 
             // for Tiros Simples
@@ -525,36 +539,6 @@ public class GameRun {
         //            }
         //        }
 
-        for (int i = 0, px = 20; i < player.getVidas(); i++, px += 48)                 //DESENHA INTERFACE VIDAS
-            g2d.drawImage(gui_vidas, px, 20, null);
-        for (int i = 0, px = 722; i < player.getNumMisseis(); i++, px -= 48)             //DESENHA INTERFACE MISSEIS
-            g2d.drawImage(gui_misseis, px, 20, null);
-        if (cargaMissil < 50 && cargaMissil > 0) {
-            //            g2d.draw(new Rectangle2D.Double((int)player.getPX()+65, (int)player.getPY()+85, 50, 5));
-            g2d.setPaint(new GradientPaint(0, (int) player.getPY() + 86, Color.cyan, 0, (int) player.getPY() + 89, Color.black));
-            g2d.fill(new Rectangle2D.Double((int) player.getPX() + 66, (int) player.getPY() + 86, cargaMissil, 3));
-        }
-
-
-        g2d.setFont(fonteTxt);
-        if (player.getTempoTurbo() > 20 && player.getTempoTurbo() < 20.5) {           //DESENHA INTERFACE TURBO
-            g2d.setPaint(new GradientPaint(0, 541, Color.green, 0, 549, Color.black));
-            g2d.drawString("TURBO AVAILABLE", 25, 530);
-            g2d.drawString("TURBO ON!", (int) player.getPX() + 50, (int) player.getPY() + 95);
-        } else if (player.getTempoTurbo() > 20) {
-            g2d.setPaint(new GradientPaint(0, 541, Color.green, 0, 549, Color.black));
-            g2d.drawString("TURBO AVAILABLE", 25, 530);
-        } else if (player.getTurbo()) {
-            g2d.setPaint(new GradientPaint(0, 541, Color.orange, 0, 549, Color.black));
-            g2d.drawString("TURBO ACTIVATED", 25, 530);
-        } else {
-            g2d.setPaint(new GradientPaint(0, 541, Color.yellow, 0, 549, Color.black));
-            g2d.drawString("TURBO CHARGING", 25, 530);
-        }
-        g2d.fill(new Rectangle2D.Double(26, 541, cargaTurbo, 8));
-        g2d.setColor(Color.white);
-        g2d.draw(new Rectangle2D.Double(25, 540, 148, 10));
-
 
         g2d.setFont(fontePontos);                                               //DESENHA PONTUAÇÃO
         g2d.setColor(Color.WHITE);
@@ -562,6 +546,8 @@ public class GameRun {
         tamPontuacao = g2d.getFontMetrics().stringWidth(String.valueOf(player.getPontos()));
         g2d.drawString(String.valueOf(player.getPontos()), 796 / 2 - tamPontuacao / 2, 60);
 //            g2d.drawString(testee + " " + recordes + " " + start, 10, 100);
+
+        this.hud.draw(g2d);
 
         if (player.getVidas() < 0)                                               //DESENHA GAME OVER
             g2d.drawImage(gameOver, 796 / 2 - 600 / 2, 570 / 2 - 110 / 2, null);
