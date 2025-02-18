@@ -37,14 +37,13 @@ public class GameRun {
     private Image gameOver;
     private double[] deltaInimigos = new double[64];
     private int[] posInimigos = new int[64];
-    private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, tamPontuacao, ptsAsomar = 0;
+    private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, ptsAsomar = 0;
     private double
             frametimeRespawnRedUFO = 2, frametimeRespawnGreenFire = 3.8,
             frametimeRespawnBigBang = 5.8, frametimeRespawnDeathFish = 7.8, frametimeExplosao = 0,
             frametimeInvulneravel = 10, frametimeSomaPts = 0, frametimeGameOver = 0;
 
 
-    private Font fontePontos = new Font("Verdana", Font.PLAIN, 48);
 
     private boolean CheckBoxCollision(double x1, double y1, double w1, double h1, double x2, double y2, double w2, double h2) {
         return ((x1 < x2 + w2) && (x2 < x1 + w1) && (y1 < y2 + h2) && (y2 < y1 + h1));
@@ -71,6 +70,10 @@ public class GameRun {
             missilMissileDrop[i] = new MissileDrop(SPRITE_ITEMS_DROPPEDMISSILE_PATH);
     }
 
+    public int getPlayerScore() {
+        return this.player.getScore();
+    }
+
     public double[] getPlayerPosition() {
         return this.player.getPosition();
     }
@@ -84,7 +87,6 @@ public class GameRun {
     }
 
     public double getPlayerMissileCooldownPercentage() {
-//        return this.cargaMissil / 50;
         return this.player.getMissileCooldownPercentage();
     }
 
@@ -105,7 +107,9 @@ public class GameRun {
     }
 
     public void update(double dt, CanvasPanel canvasPanel) {
-        this.background.update(dt, canvasPanel);
+        if (player.getVidas() > -1)
+            this.background.update(dt, canvasPanel);
+
         this.hud.update(dt, canvasPanel);
 
         frametimeSomaPts += dt;
@@ -114,17 +118,18 @@ public class GameRun {
             ptsAsomar--;
             frametimeSomaPts = 0;
         }
+
         if (player.getVidas() > -1) {
             player.update(dt, canvasPanel);
 
             posReturnPadrao = 0;
 
             frametimeRespawnRedUFO += dt;
-            if (player.getPontos() > 1000)
+            if (player.getScore() > 1000)
                 frametimeRespawnDeathFish += dt;
-            if (player.getPontos() > 420)
+            if (player.getScore() > 420)
                 frametimeRespawnBigBang += dt;
-            if (player.getPontos() > 100)
+            if (player.getScore() > 100)
                 frametimeRespawnGreenFire += dt;
 
 
@@ -453,14 +458,14 @@ public class GameRun {
             frametimeGameOver += dt;
             if (frametimeGameOver >= 1 && frametimeGameOver < 1 + dt) {
                 String playerName = null;
-                if (player.getPontos() > canvasPanel.getLowestHighScore()) {
+                if (player.getScore() > canvasPanel.getLowestHighScore()) {
                     while (playerName == null || playerName.isEmpty()) {
                         playerName = JOptionPane.showInputDialog(null, "Insira o seu nome", "High Score", JOptionPane.PLAIN_MESSAGE);
                         if (playerName == null || playerName.isEmpty()) {
                             JOptionPane.showMessageDialog(null, "Entre um nome");
                         }
                     }
-                    canvasPanel.addHighScore(playerName, player.getPontos());
+                    canvasPanel.addHighScore(playerName, player.getScore());
                 }
 
                 canvasPanel.finishGameRun();
@@ -540,11 +545,7 @@ public class GameRun {
         //        }
 
 
-        g2d.setFont(fontePontos);                                               //DESENHA PONTUAÇÃO
-        g2d.setColor(Color.WHITE);
 
-        tamPontuacao = g2d.getFontMetrics().stringWidth(String.valueOf(player.getPontos()));
-        g2d.drawString(String.valueOf(player.getPontos()), 796 / 2 - tamPontuacao / 2, 60);
 //            g2d.drawString(testee + " " + recordes + " " + start, 10, 100);
 
         this.hud.draw(g2d);

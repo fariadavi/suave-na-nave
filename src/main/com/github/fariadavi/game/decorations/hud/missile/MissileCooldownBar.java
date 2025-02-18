@@ -35,6 +35,7 @@ public class MissileCooldownBar extends CanvasComponent {
     @Override
     public void draw(Graphics2D g2d) {
         if (this.missileCooldownPercentage > 0 && this.missileCooldownPercentage < 1) {
+            g2d.setColor(Color.WHITE);
             g2d.draw(new Rectangle2D.Double(
                     this.getPX(),
                     this.getPY(),

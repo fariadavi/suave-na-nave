@@ -108,6 +108,10 @@ public class CanvasPanel extends JPanel implements Runnable {
         this.gameRun = null;
     }
 
+    public int getPlayerScore() {
+        return this.gameRun.getPlayerScore();
+    }
+
     public double[] getPlayerPosition() {
         return this.gameRun.getPlayerPosition();
     }
