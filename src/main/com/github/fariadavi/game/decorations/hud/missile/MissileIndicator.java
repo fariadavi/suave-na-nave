@@ -6,5 +6,7 @@ public class MissileIndicator extends CanvasImageComponent {
 
     public MissileIndicator(String imageResourcePath, int x, int y, boolean isActive) {
         super(imageResourcePath, x, y, isActive);
+
+        setAlignmentX(ALIGNMENT_END);
     }
 }

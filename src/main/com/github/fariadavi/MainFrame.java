@@ -1,7 +1,7 @@
 package main.com.github.fariadavi;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import java.awt.*;
 
 public class MainFrame extends JFrame {
 
@@ -12,11 +12,14 @@ public class MainFrame extends JFrame {
         setTitle("Suave na Nave");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         add(new CanvasPanel());
-        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        setLocationRelativeTo(null);
-        setExtendedState(MAXIMIZED_BOTH);
-        setResizable(false);
+//        setUndecorated(true);
 //        setResizable(true);
+        setResizable(false);
+        setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        pack();
+
+        setExtendedState(MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
     }
 
     public static void main(String[] args) {

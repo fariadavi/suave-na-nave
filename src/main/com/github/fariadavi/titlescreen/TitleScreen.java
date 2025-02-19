@@ -20,7 +20,7 @@ public class TitleScreen extends CanvasGroupComponent {
         background = new Background();
         title = new Title(796 / 2, 20);
         mockPlayer = new MockPlayer(80, 280);
-        menu = new Menu(796 / 4 * 3, 250);
+        menu = new Menu(796 / 4 * 3, 280);
         scoreboard = new Scoreboard(365, 610);
         credits = new Credits(796 / 2 - 373 / 2, 600);
 

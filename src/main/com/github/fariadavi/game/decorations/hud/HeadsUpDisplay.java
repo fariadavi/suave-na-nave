@@ -7,6 +7,7 @@ import main.com.github.fariadavi.game.decorations.hud.missile.MissileHUD;
 import main.com.github.fariadavi.game.decorations.hud.score.ScoreHUD;
 import main.com.github.fariadavi.game.decorations.hud.turbo.TurboHUD;
 
+import static main.com.github.fariadavi.MainFrame.WINDOW_HEIGHT;
 import static main.com.github.fariadavi.MainFrame.WINDOW_WIDTH;
 
 public class HeadsUpDisplay extends CanvasGroupComponent {
@@ -20,8 +21,8 @@ public class HeadsUpDisplay extends CanvasGroupComponent {
         super(true);
 
         this.lifeHUD = new LifeHUD(20, 20, maxLives);
-        this.missileHUD = new MissileHUD(722, 20, maxMissiles);
-        this.turboHUD = new TurboHUD(25, 530);
+        this.missileHUD = new MissileHUD(WINDOW_WIDTH - 20, 20, maxMissiles);
+        this.turboHUD = new TurboHUD(20, WINDOW_HEIGHT - 40);
         this.score = new ScoreHUD(WINDOW_WIDTH / 2, 60);
 
         setComponents(
