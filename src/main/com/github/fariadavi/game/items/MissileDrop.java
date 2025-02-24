@@ -1,52 +1,26 @@
 package main.com.github.fariadavi.game.items;
 
-import main.com.github.fariadavi.utils.FileHelper;
+import main.com.github.fariadavi.CanvasCollidableImageComponent;
+import main.com.github.fariadavi.CanvasPanel;
 
-import javax.swing.*;
-import java.awt.*;
+import static main.com.github.fariadavi.game.ships.player.Player.PLAYER_MAX_MISSILE_CHARGES;
+import static main.com.github.fariadavi.utils.SpriteMappings.SPRITE_DROP_MISSILE_PATH;
 
-public class MissileDrop {
-    private Image dropImg;
-    public double frametime, px, py;
-    public boolean ativo;
+public class MissileDrop extends CanvasCollidableImageComponent {
 
-    public MissileDrop(String imagePath) {
-        dropImg = FileHelper.getImage(imagePath);
+    public MissileDrop(int x, int y) {
+        super(SPRITE_DROP_MISSILE_PATH, x, y, true);
     }
 
-    public void ativar(double pxNave, double pyNave) {
-        ativo = true;
-    px = pxNave;
-        py = pyNave;
-    }
+    public void update(double dt, CanvasPanel canvasPanel) {
+        if (!this.isActive()) return;
 
-    public void desativar() {
-        ativo = false;
-        frametime = 0;
-    }
+        this.moveX(MOVE_DIRECTION_LEFT, dt, 64 * canvasPanel.getPlayerSpeedMultiplier());
 
-    public boolean ativo() {
-        return ativo;
-    }
-
-    public double getPX() {
-        return px;
-    }
-
-    public double getPY() {
-        return py;
-    }
-
-    public void update(double dt) {
-        if (ativo)
-            frametime += dt;
-        if (frametime > 80)
-            desativar();
-        px -= 5 * dt;
-    }
-
-    public void draw(Graphics2D g2d) {
-        if (ativo)
-            g2d.drawImage(dropImg, (int) px + 16, (int) py + 16, null);
+        if (canvasPanel.getPlayerMissileCharges() < PLAYER_MAX_MISSILE_CHARGES
+                && this.checkForCollision(canvasPanel.getPlayerShip())) {
+            this.deactivate();
+            canvasPanel.addPlayerMissileCharges(1);
+        }
     }
 }

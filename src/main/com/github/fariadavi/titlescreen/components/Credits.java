@@ -14,7 +14,7 @@ public class Credits extends CanvasImageComponent {
     public void update(double dt, CanvasPanel canvasPanel) {
         if (!this.isActive()) return;
 
-        this.move(MOVE_DIRECTION_UP, dt, 200);
+        this.moveY(MOVE_DIRECTION_UP, dt, 200);
 
         if (!this.isVisible())
             canvasPanel.resetTitleScreen();

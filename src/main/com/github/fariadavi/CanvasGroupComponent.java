@@ -82,13 +82,24 @@ public class CanvasGroupComponent extends CanvasComponent {
     }
 
     @Override
-    public void move(String direction, double dt, int dtMultiplier) {
-        super.move(direction, dt, dtMultiplier);
+    public void moveX(double direction, double dt, double dtMultiplier) {
+        super.moveX(direction, dt, dtMultiplier);
 
         for (CanvasComponent component : components) {
             if (component == null) continue;
 
-            component.move(direction, dt, dtMultiplier);
+            component.moveX(direction, dt, dtMultiplier);
+        }
+    }
+
+    @Override
+    public void moveY(double direction, double dt, double dtMultiplier) {
+        super.moveY(direction, dt, dtMultiplier);
+
+        for (CanvasComponent component : components) {
+            if (component == null) continue;
+
+            component.moveY(direction, dt, dtMultiplier);
         }
     }
 }

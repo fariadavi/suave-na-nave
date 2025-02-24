@@ -1,89 +1,93 @@
 package main.com.github.fariadavi.game;
 
+import main.com.github.fariadavi.CanvasGroupComponent;
 import main.com.github.fariadavi.CanvasPanel;
+import main.com.github.fariadavi.game.decorations.ShipExplosion;
 import main.com.github.fariadavi.game.decorations.background.GameBackground;
 import main.com.github.fariadavi.game.decorations.hud.HeadsUpDisplay;
 import main.com.github.fariadavi.game.items.MissileDrop;
-import main.com.github.fariadavi.game.ships.*;
-import main.com.github.fariadavi.game.shots.MissileShot;
-import main.com.github.fariadavi.game.shots.RegularShot;
+import main.com.github.fariadavi.game.ships.Ship;
+import main.com.github.fariadavi.game.ships.enemy.Enemy;
+import main.com.github.fariadavi.game.ships.enemy.EnemyType;
+import main.com.github.fariadavi.game.ships.player.Player;
+import main.com.github.fariadavi.game.shots.EnemySimpleShot;
+import main.com.github.fariadavi.game.shots.PlayerMissileShot;
+import main.com.github.fariadavi.game.shots.PlayerSimpleShot;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 
-import static main.com.github.fariadavi.utils.FileHelper.getImage;
-import static main.com.github.fariadavi.utils.SpriteMappings.*;
-
-public class GameRun {
+public class GameRun extends CanvasGroupComponent {
 
     public static final int MAX_HEALTH = 3;
     public static final int MAX_MISSILES = 3;
 
     private final GameBackground background;
     private final HeadsUpDisplay hud;
-    private Player player;
+    private final Player player;
+    private final GameOver gameOver;
 
-    private RedUFO[] redUFO = new RedUFO[16];
-    private GreenFire[] greenFire = new GreenFire[16];
-    private BigBang[] bigBang = new BigBang[16];
-    private DeathFish[] deathFish = new DeathFish[16];
+    private int score = 0, scoreBuffer = 0;
+    private double dtScore = 0d;
 
-    private RegularShot[] tiros = new RegularShot[16];
-    private MissileShot[] misseis = new MissileShot[3];
+    private final EnemyType[] enemyTypes = {
+            EnemyType.RED_UFO,
+            EnemyType.GREEN_FIRE,
+            EnemyType.BIG_BANG,
+            EnemyType.DEATH_FISH
+    };
+    private final Enemy[] enemies = new Enemy[64];
+    private final double[] dtEnemies = new double[enemyTypes.length];
+    private final ShipExplosion[] explosions = new ShipExplosion[64];
 
-    private MissileDrop[] missilMissileDrop = new MissileDrop[64];
+    private final PlayerSimpleShot[] playerSimpleShots = new PlayerSimpleShot[8];
+    private final PlayerMissileShot[] playerMissileShots = new PlayerMissileShot[3];
 
-    private Image gameOver;
-    private double[] deltaInimigos = new double[64];
-    private int[] posInimigos = new int[64];
-    private int posReturnPadrao = 0, targetMissil = 0, contBlink = 0, ptsAsomar = 0;
-    private double
-            frametimeRespawnRedUFO = 2, frametimeRespawnGreenFire = 3.8,
-            frametimeRespawnBigBang = 5.8, frametimeRespawnDeathFish = 7.8, frametimeExplosao = 0,
-            frametimeInvulneravel = 10, frametimeSomaPts = 0, frametimeGameOver = 0;
+    private final EnemySimpleShot[] enemySimpleShots = new EnemySimpleShot[32];
 
-
-
-    private boolean CheckBoxCollision(double x1, double y1, double w1, double h1, double x2, double y2, double w2, double h2) {
-        return ((x1 < x2 + w2) && (x2 < x1 + w1) && (y1 < y2 + h2) && (y2 < y1 + h1));
-    }
+    private final MissileDrop[] missileDrops = new MissileDrop[16];
 
     public GameRun() {
+        super(true);
         this.background = new GameBackground();
         this.hud = new HeadsUpDisplay(MAX_HEALTH, MAX_MISSILES);
-        player = new Player();
-        gameOver = getImage(SPRITE_TEXTS_GAMEOVER_PATH);
-
-        for (int i = 0; i < 16; i++) {
-            redUFO[i] = new RedUFO();
-            greenFire[i] = new GreenFire();
-            bigBang[i] = new BigBang();
-            deathFish[i] = new DeathFish();
-            tiros[i] = new RegularShot(false);
-        }
-
-        for (int i = 0; i < 3; i++)
-            misseis[i] = new MissileShot();
-
-        for (int i = 0; i < 64; i++)
-            missilMissileDrop[i] = new MissileDrop(SPRITE_ITEMS_DROPPEDMISSILE_PATH);
+        this.player = new Player(80, 280);
+        for (int i = 0; i < this.dtEnemies.length; i++)
+            this.dtEnemies[i] = this.enemyTypes[i].getRespawnInterval();
+        this.gameOver = new GameOver();
     }
 
-    public int getPlayerScore() {
-        return this.player.getScore();
+    public int getScore() {
+        return this.score;
+    }
+
+    public Enemy getEnemyShipByIndex(Integer targetIndex) {
+        if (targetIndex == null || targetIndex < 0 || targetIndex >= this.enemies.length) return null;
+
+        return this.enemies[targetIndex];
+    }
+
+    public Enemy[] getEnemyShips() {
+        return this.enemies;
+    }
+
+    public Player getPlayerShip() {
+        return this.player;
     }
 
     public double[] getPlayerPosition() {
         return this.player.getPosition();
     }
 
-    public int getPlayerLives() {
-        return this.player.getVidas();
+    public int getPlayerHealthPoints() {
+        return this.player.getHealthPoints();
     }
 
     public int getPlayerMissileCharges() {
-        return this.player.getNumMisseis();
+        return this.player.getNumMissileCharges();
+    }
+
+    public void addPlayerMissileCharges(int missileCharges) {
+        this.player.addMissileCharges(missileCharges);
     }
 
     public double getPlayerMissileCooldownPercentage() {
@@ -91,466 +95,203 @@ public class GameRun {
     }
 
     public boolean isPlayerTurboActive() {
-        return this.player.getTurbo();
-    }
-
-    public double getPlayerTempoTurbo() {
-        return this.player.getTempoTurbo();
+        return this.player.isBoosted();
     }
 
     public double getPlayerTurboChargePercentage() {
         return this.player.getTurboChargePercentage();
     }
 
-    public double getPlayerSpeed() {
-        return this.player.getSpeed();
+    public double getPlayerSpeedMultiplier() {
+        return this.player.getSpeedMultiplier();
+    }
+
+    public void createPlayerSimpleShot() {
+        for (int i = 0; i < this.playerSimpleShots.length; i++)
+            if (this.playerSimpleShots[i] == null || !this.playerSimpleShots[i].isActive()) {
+                this.playerSimpleShots[i] = new PlayerSimpleShot(
+                        (int) (this.player.getPX() + this.player.getWidth() - this.player.getCollisionInsetX()),
+                        (int) (this.player.getPY() + (this.player.getHeight() / 2))
+                );
+                break;
+            }
+    }
+
+    public void createPlayerMissileShot() {
+        for (int i = 0; i < this.playerMissileShots.length; i++)
+            if (this.playerMissileShots[i] == null || !this.playerMissileShots[i].isActive()) {
+                this.playerMissileShots[i] = new PlayerMissileShot(
+                        (int) (this.player.getCollidableEndX()),
+                        (int) (this.player.getPY() + (this.player.getHeight() / 2)),
+                        getNearestEnemyToPlayer()
+                );
+                break;
+            }
+    }
+
+    public void createEnemySimpleShot(Enemy enemy) {
+        for (int i = 0; i < this.enemySimpleShots.length; i++)
+            if (this.enemySimpleShots[i] == null || !this.enemySimpleShots[i].isActive()) {
+                this.enemySimpleShots[i] = new EnemySimpleShot(
+                        (int) enemy.getCollidableStartX(),
+                        (int) (enemy.getPY() + (enemy.getHeight() / 2))
+                );
+                break;
+            }
+    }
+
+    private Integer getNearestEnemyToPlayer() {
+        double playerCenterX = this.player.getCollidableCenterX();
+        double playerCenterY = this.player.getCollidableCenterY();
+
+        Integer nearestEnemyIndex = null;
+        Double nearestEnemyDistance = null;
+        for (int i = 0; i < this.enemies.length; i++) {
+            Enemy enemy = this.enemies[i];
+            if (enemy == null || !enemy.isActive()) continue;
+
+            double deltaX = Math.abs(enemy.getCollidableCenterX() - playerCenterX);
+            double deltaY = Math.abs(enemy.getCollidableCenterY() - playerCenterY);
+            double deltaHip = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (nearestEnemyDistance == null || deltaHip < nearestEnemyDistance) {
+                nearestEnemyIndex = i;
+                nearestEnemyDistance = deltaHip;
+            }
+        }
+
+        return nearestEnemyIndex;
+    }
+
+    public void addBountyToScore(Enemy collidedEnemy) {
+        for (EnemyType enemyType : this.enemyTypes)
+            if (collidedEnemy.getClass().equals(enemyType.getEnemyClass()))
+                this.scoreBuffer += enemyType.getBounty();
+    }
+
+    public void explodeShip(Ship ship) {
+        for (int i = 0; i < this.explosions.length; i++)
+            if (this.explosions[i] == null || !this.explosions[i].isActive()) {
+                this.explosions[i] = new ShipExplosion((int) ship.getPX(), (int) ship.getPY());
+                break;
+            }
+    }
+
+    public void dropMissile(int x, int y) {
+        for (int i = 0; i < this.missileDrops.length; i++)
+            if (this.missileDrops[i] == null || !this.missileDrops[i].isActive()) {
+                this.missileDrops[i] = new MissileDrop(x, y);
+                break;
+            }
     }
 
     public void update(double dt, CanvasPanel canvasPanel) {
-        if (player.getVidas() > -1)
-            this.background.update(dt, canvasPanel);
-
         this.hud.update(dt, canvasPanel);
-
-        frametimeSomaPts += dt;
-        if (ptsAsomar > 0 && frametimeSomaPts > 0.02) {
-            player.addPts();
-            ptsAsomar--;
-            frametimeSomaPts = 0;
+        for (ShipExplosion explosion : this.explosions) {
+            if (explosion != null)
+                explosion.update(dt, canvasPanel);
         }
 
-        if (player.getVidas() > -1) {
-            player.update(dt, canvasPanel);
+        if (this.dtScore < 0.02)
+            this.dtScore += dt;
+        else if (this.scoreBuffer > 0) {
+            this.score++;
+            this.scoreBuffer--;
+            this.dtScore = 0;
+        }
 
-            posReturnPadrao = 0;
+        this.gameOver.update(dt, canvasPanel);
+        if (this.player.getHealthPoints() < 0) {
+            if (!this.gameOver.isActive())
+                this.gameOver.activate();
 
-            frametimeRespawnRedUFO += dt;
-            if (player.getScore() > 1000)
-                frametimeRespawnDeathFish += dt;
-            if (player.getScore() > 420)
-                frametimeRespawnBigBang += dt;
-            if (player.getScore() > 100)
-                frametimeRespawnGreenFire += dt;
+            return;
+        }
 
+        this.background.update(dt, canvasPanel);
+        this.player.update(dt, canvasPanel);
 
-            if (ptsAsomar > 0 && frametimeSomaPts > 0.02) {
-                player.addPts();
-                ptsAsomar--;
-                frametimeSomaPts = 0;
-            }
+        for (Enemy enemy : this.enemies)
+            if (enemy != null)
+                enemy.update(dt, canvasPanel);
 
-            if (player.getInvulneravel()) {                                     //BLINK/INVULNERAVEL QDO MORRE
-                frametimeInvulneravel += dt;
-                if (contBlink >= 16 && frametimeInvulneravel > 10.5) {
-                    frametimeInvulneravel = 20;
-                    contBlink = 0;
-                    player.setBlink(false);
-                    player.setInvulneravel(false);
-                    player.setAlive(true);
-                } else if (frametimeInvulneravel > 20.1 && contBlink % 2 != 0 && contBlink < 16) {
-                    player.setBlink(false);
-                    frametimeInvulneravel = 10;
-                    contBlink++;
-                } else if (frametimeInvulneravel > 10.1 && contBlink % 2 == 0 && contBlink < 16) {
-                    player.setBlink(true);
-                    frametimeInvulneravel = 20;
-                    contBlink++;
-                }
-            }
-            for (int i = 0; i < 16; i++) {
-                redUFO[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
-                greenFire[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
-                bigBang[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
-                deathFish[i].setTurbo(player.getTurbo(), player.getTempoTurbo());
-            }
+        for (EnemySimpleShot enemySimpleShot : this.enemySimpleShots)
+            if (enemySimpleShot != null)
+                enemySimpleShot.update(dt, canvasPanel);
 
-            // for Tiros Simples
-            for (int i = 0; i < 16; i++) {
-                if (player.getTiro()) {
-                    if (!tiros[i].ativo()) {
-                        tiros[i].ativar(player.getPX(), player.getPY());
-                        break;
-                    }
-                }
-                if (tiros[i].ativo()) {
-                    tiros[i].update(dt);
-                    for (int j = 0; j < 16; j++) {
-                        if (CheckBoxCollision(tiros[i].getPX(), tiros[i].getPY(), 20, 8, redUFO[j].getPX() + 8, redUFO[j].getPY() + 8, 48, 48) && redUFO[j].isAlive()) {
-                            tiros[i].desativar();
-                            redUFO[j].hit();
-                            if (!redUFO[j].isAlive())
-                                ptsAsomar += 10;
-                        } else if (CheckBoxCollision(tiros[i].getPX(), tiros[i].getPY(), 20, 8, greenFire[j].getPX(), greenFire[j].getPY() + 8, 48, 64) && greenFire[j].isAlive()) {
-                            tiros[i].desativar();
-                            greenFire[j].hit();
-                            if (!greenFire[j].isAlive())
-                                ptsAsomar += 50;
-                        } else if (CheckBoxCollision(tiros[i].getPX(), tiros[i].getPY(), 20, 8, bigBang[j].getPX(), bigBang[j].getPY() + 8, 48, 64) && bigBang[j].isAlive()) {
-                            tiros[i].desativar();
-                            bigBang[j].hit();
-                            if (!bigBang[j].isAlive())
-                                ptsAsomar += 100;
-                        } else if (CheckBoxCollision(tiros[i].getPX(), tiros[i].getPY(), 20, 8, deathFish[j].getPX(), deathFish[j].getPY() + 8, 48, 64) && deathFish[j].isAlive()) {
-                            tiros[i].desativar();
-                            deathFish[j].hit();
-                            if (!deathFish[j].isAlive())
-                                ptsAsomar += 200;
-                        } else if (tiros[i].getPX() > 799) {
-                            tiros[i].desativar();
-                        }
-                    }
-                }
-            }
-            //for Misseis
-            for (int i = 0, j = 16, k = 32, l = 48; i < 16; i++, j++, k++, l++) {
-                deltaInimigos[i] = redUFO[i].setDeltaHip(redUFO[i].getPX() + 8, player.getPX() + 128, redUFO[i].getPY() + 32, player.getPY() + 64);
-                deltaInimigos[j] = greenFire[i].setDeltaHip(greenFire[i].getPX(), player.getPX() + 128, greenFire[i].getPY() + 32, player.getPY() + 64);
-                deltaInimigos[k] = bigBang[i].setDeltaHip(bigBang[i].getPX(), player.getPX() + 128, bigBang[i].getPY() + 32, player.getPY() + 64);
-                deltaInimigos[l] = deathFish[i].setDeltaHip(deathFish[i].getPX(), player.getPX() + 128, deathFish[i].getPY() + 32, player.getPY() + 64);
-                posInimigos[i] = i;
-                posInimigos[j] = j;
-                posInimigos[k] = k;
-                posInimigos[l] = l;
-            }
-            for (int i = 0; i < 3; i++) {
-                if (player.getMissil()) {
-                    targetMissil = player.target(deltaInimigos, posInimigos, posReturnPadrao);
-                    if (player.getNumMisseis() > 0) {
-                        if (!misseis[i].ativo()) {
-                            player.setNumMisseis(-1);
-                            misseis[i].ativar(player.getPX(), player.getPY());
-                            break;
-                        }
-                    }
-                }
-                if (misseis[i].ativo()) {
-                    while (targetMissil < 16 && !redUFO[targetMissil].isAlive() ||
-                            targetMissil > 15 && targetMissil < 32 && !greenFire[targetMissil - 16].isAlive() ||
-                            targetMissil > 31 && targetMissil < 48 && !bigBang[targetMissil - 32].isAlive() ||
-                            targetMissil > 47 && targetMissil < 64 && !deathFish[targetMissil - 48].isAlive()) {
-                        posReturnPadrao++;
-                        targetMissil = player.target(deltaInimigos, posInimigos, posReturnPadrao);
-                    }
-                    if (targetMissil < 16) {
-                        redUFO[targetMissil].setDX(redUFO[targetMissil].getPX() + 8, misseis[i].getPX() + 22);
-                        redUFO[targetMissil].setDY(redUFO[targetMissil].getPY() + 32, misseis[i].getPY() + 6);
-                        misseis[i].setMult(redUFO[targetMissil].getDX(), redUFO[targetMissil].getDY());
-                    } else if (targetMissil < 32) {
-                        greenFire[targetMissil - 16].setDX(greenFire[targetMissil - 16].getPX(), misseis[i].getPX() + 22);
-                        greenFire[targetMissil - 16].setDY(greenFire[targetMissil - 16].getPY() + 32, misseis[i].getPY() + 6);
-                        misseis[i].setMult(greenFire[targetMissil - 16].getDX(), greenFire[targetMissil - 16].getDY());
-                    } else if (targetMissil < 48) {
-                        bigBang[targetMissil - 32].setDX(bigBang[targetMissil - 32].getPX() + 2, misseis[i].getPX() + 22);
-                        bigBang[targetMissil - 32].setDY(bigBang[targetMissil - 32].getPY() + 32, misseis[i].getPY() + 6);
-                        misseis[i].setMult(bigBang[targetMissil - 32].getDX(), bigBang[targetMissil - 32].getDY());
-                    } else if (targetMissil < 64) {
-                        deathFish[targetMissil - 48].setDX(deathFish[targetMissil - 48].getPX() + 2, misseis[i].getPX() + 22);
-                        deathFish[targetMissil - 48].setDY(deathFish[targetMissil - 48].getPY() + 32, misseis[i].getPY() + 6);
-                        misseis[i].setMult(deathFish[targetMissil - 48].getDX(), deathFish[targetMissil - 48].getDY());
-                    }
-                    misseis[i].update(dt);
-                    for (int j = 0; j < 16; j++) {
-                        if (CheckBoxCollision(misseis[i].getPX(), misseis[i].getPY(), 22, 14, redUFO[j].getPX() + 8, redUFO[j].getPY() + 8, 48, 48) && redUFO[j].isAlive()) {
-                            misseis[i].desativar();
-                            redUFO[j].die();
-                            ptsAsomar += 10;
-                        } else if (CheckBoxCollision(misseis[i].getPX(), misseis[i].getPY(), 22, 14, greenFire[j].getPX(), greenFire[j].getPY() + 8, 60, 48) && greenFire[j].isAlive()) {
-                            misseis[i].desativar();
-                            greenFire[j].die();
-                            ptsAsomar += 50;
-                        } else if (CheckBoxCollision(misseis[i].getPX(), misseis[i].getPY(), 22, 14, bigBang[j].getPX(), bigBang[j].getPY() + 8, 60, 48) && bigBang[j].isAlive()) {
-                            misseis[i].desativar();
-                            bigBang[j].die();
-                            ptsAsomar += 100;
-                        } else if (CheckBoxCollision(misseis[i].getPX(), misseis[i].getPY(), 22, 14, deathFish[j].getPX(), deathFish[j].getPY() + 8, 60, 48) && deathFish[j].isAlive()) {
-                            misseis[i].desativar();
-                            deathFish[j].die();
-                            ptsAsomar += 200;
-                        }
-                    }
-                    if (misseis[i].getPX() > 799 || misseis[i].getPY() > 599) {
-                        misseis[i].desativar();
-                    }
-                }
-            }
-            // for Drop
-            for (int i = 0; i < 16; i++) {
-                for (int j = 0; j < 64; j++) {
-                    if (redUFO[i].getDropMissil()) {
-                        if (!missilMissileDrop[j].ativo()) {
-                            missilMissileDrop[j].ativar(redUFO[i].getPX(), redUFO[i].getPY());
-                            redUFO[i].setDropMissil(false);
-                        }
-                    }
-                    if (greenFire[i].getDropMissil()) {
-                        if (!missilMissileDrop[j].ativo()) {
-                            missilMissileDrop[j].ativar(greenFire[i].getPX(), greenFire[i].getPY());
-                            greenFire[i].setDropMissil(false);
-                        }
-                    }
-                    if (bigBang[i].getDropMissil()) {
-                        if (!missilMissileDrop[j].ativo()) {
-                            missilMissileDrop[j].ativar(bigBang[i].getPX(), bigBang[i].getPY());
-                            bigBang[i].setDropMissil(false);
-                        }
-                    }
-                    if (deathFish[i].getDropMissil()) {
-                        if (!missilMissileDrop[j].ativo()) {
-                            missilMissileDrop[j].ativar(deathFish[i].getPX(), deathFish[i].getPY());
-                            deathFish[i].setDropMissil(false);
-                        }
-                    }
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, missilMissileDrop[j].getPX() + 16, missilMissileDrop[j].getPY() + 16, 32, 32) && missilMissileDrop[j].ativo() && player.getNumMisseis() < 3) {
-                        player.setNumMisseis(1);
-                        missilMissileDrop[j].desativar();
-                    }
-                    missilMissileDrop[j].update(dt);
-                }
-            }
-            //for RedUFOs
-            for (int i = 0; i < 16; i++) {
-                if (frametimeRespawnRedUFO > 1.5) {
-                    if (!redUFO[i].isAlive()) {
-                        int py = RedUFO.randInt(-8, 516);
-                        redUFO[i].spawn(800, py);
-                        frametimeRespawnRedUFO = 0;
-                        break;
-                    }
-                }
-                if (redUFO[i].isAlive()) {
-                    redUFO[i].update(dt);
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, redUFO[i].getPX() + 8, redUFO[i].getPY() + 8, 48, 48) && !player.getInvulneravel()) {
-                        redUFO[i].die();
-                        player.hit();
-                    }
-                    if (redUFO[i].getPX() < -64) {
-                        redUFO[i].die();
-                    }
-                }
-                for (int j = 0; j < 16; j++) {                                     // EXPLOSAO NAVE INIMIGA
-                    if (redUFO[i].getExplodirBool()) {
-                        frametimeExplosao += dt;
-                        if (frametimeExplosao > 1 && redUFO[i].getExplodir() < 15) {
-                            redUFO[i].incrementaExplodir();
-                            frametimeExplosao = 0;
-                        } else if (redUFO[i].getExplodir() >= 15) {
-                            frametimeExplosao = 0;
-                            redUFO[i].setExplodir(0);
-                            redUFO[i].setExplodirBool(false);
-                            break;
-                        }
-                    }
-                }
-            }
-            //for GreenFire
-            for (int i = 0; i < 16; i++) {
-                if (frametimeRespawnGreenFire > 4) {
-                    if (!greenFire[i].isAlive()) {
-                        int py = GreenFire.randInt(-8, 516);
-                        greenFire[i].spawn(800, py);
-                        frametimeRespawnGreenFire = 0;
-                        break;
-                    }
-                }
-                greenFire[i].update(dt);
-                if (greenFire[i].isAlive()) {
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, greenFire[i].getPX() + 2, greenFire[i].getPY() + 8, 60, 48) && !player.getInvulneravel()) {
-                        greenFire[i].die();
-                        player.hit();
-                    }
-                    if (greenFire[i].getPX() < -64) {
-                        greenFire[i].die();
-                    }
-                }
-                for (int j = 0; j < 16; j++) {                                     // EXPLOSAO NAVE INIMIGA
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, greenFire[i].getTiroInimPX(j) + 4, greenFire[i].getTiroInimPY(j), 24, 6) && !player.getInvulneravel()) {
-                        greenFire[i].playerHit(j);
-                        player.hit();
-                    }
-                    if (greenFire[i].getExplodirBool()) {
-                        frametimeExplosao += dt;
-                        if (frametimeExplosao > 1 && greenFire[i].getExplodir() < 15) {
-                            greenFire[i].incrementaExplodir();
-                            frametimeExplosao = 0;
-                        } else if (greenFire[i].getExplodir() >= 15) {
-                            greenFire[i].setExplodir(0);
-                            greenFire[i].setExplodirBool(false);
-                            break;
-                        }
-                    }
-                }
-            }
-            //for BigBang
-            for (int i = 0; i < 16; i++) {
-                if (frametimeRespawnBigBang > 6) {
-                    if (!bigBang[i].isAlive()) {
-                        int py = BigBang.randInt(92, 416);
-                        bigBang[i].spawn(800, py);
-                        bigBang[i].setPYinic(py);
-                        frametimeRespawnBigBang = 0;
-                        break;
-                    }
-                }
-                if (bigBang[i].isAlive()) {
-                    bigBang[i].update(dt);
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, bigBang[i].getPX() + 8, bigBang[i].getPY() + 8, 48, 48) && !player.getInvulneravel()) {
-                        bigBang[i].die();
-                        player.hit();
-                    }
-                    if (bigBang[i].getPX() < -64) {
-                        bigBang[i].die();
-                    }
-                }
-                for (int j = 0; j < 16; j++) {                                     // EXPLOSAO NAVE INIMIGA
-                    if (bigBang[i].getExplodirBool()) {
-                        frametimeExplosao += dt;
-                        if (frametimeExplosao > 1 && bigBang[i].getExplodir() < 15) {
-                            bigBang[i].incrementaExplodir();
-                            frametimeExplosao = 0;
-                        } else if (bigBang[i].getExplodir() >= 15) {
-                            bigBang[i].setExplodir(0);
-                            bigBang[i].setExplodirBool(false);
-                            break;
-                        }
-                    }
-                }
-            }
-            //for DeathFish
-            for (int i = 0; i < 16; i++) {
-                if (frametimeRespawnDeathFish > 8) {
-                    if (!deathFish[i].isAlive()) {
-                        int py = DeathFish.randInt(0, 330);
-                        deathFish[i].spawn(800, py);
-                        deathFish[i].zeraIt();
-                        frametimeRespawnDeathFish = 0;
-                        break;
-                    }
-                }
-                deathFish[i].update(dt);
-                if (deathFish[i].isAlive()) {
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, deathFish[i].getPX() + 8, deathFish[i].getPY() + 8, 48, 48) && !player.getInvulneravel()) {
-                        deathFish[i].die();
-                        player.hit();
-                    }
-                    if (deathFish[i].getPX() < -64) {
-                        deathFish[i].die();
-                    }
-                }
-                for (int j = 0; j < 16; j++) {                                     // EXPLOSAO NAVE INIMIGA
-                    if (CheckBoxCollision(player.getPX() + 62, player.getPY() + 50, 60, 30, deathFish[i].getTiroInimPX(j) + 4, deathFish[i].getTiroInimPY(j), 24, 6) && !player.getInvulneravel()) {
-                        deathFish[i].playerHit(j);
-                        player.hit();
-                    }
-                    if (deathFish[i].getExplodirBool()) {
-                        frametimeExplosao += dt;
-                        if (frametimeExplosao > 1 && deathFish[i].getExplodir() < 15) {
-                            deathFish[i].incrementaExplodir();
-                            frametimeExplosao = 0;
-                        } else if (deathFish[i].getExplodir() >= 15) {
-                            deathFish[i].setExplodir(0);
-                            deathFish[i].setExplodirBool(false);
-                            break;
-                        }
-                    }
-                }
-            }
-        } else {
-            frametimeGameOver += dt;
-            if (frametimeGameOver >= 1 && frametimeGameOver < 1 + dt) {
-                String playerName = null;
-                if (player.getScore() > canvasPanel.getLowestHighScore()) {
-                    while (playerName == null || playerName.isEmpty()) {
-                        playerName = JOptionPane.showInputDialog(null, "Insira o seu nome", "High Score", JOptionPane.PLAIN_MESSAGE);
-                        if (playerName == null || playerName.isEmpty()) {
-                            JOptionPane.showMessageDialog(null, "Entre um nome");
-                        }
-                    }
-                    canvasPanel.addHighScore(playerName, player.getScore());
-                }
+        for (PlayerSimpleShot playerSimpleShot : this.playerSimpleShots)
+            if (playerSimpleShot != null)
+                playerSimpleShot.update(dt, canvasPanel);
 
-                canvasPanel.finishGameRun();
-            }
+        for (PlayerMissileShot playerMissileShot : this.playerMissileShots)
+            if (playerMissileShot != null)
+                playerMissileShot.update(dt, canvasPanel);
+
+        for (MissileDrop missileDrop : this.missileDrops)
+            if (missileDrop != null)
+                missileDrop.update(dt, canvasPanel);
+
+        for (int i = 0; i < this.enemyTypes.length; i++) {
+            if (this.score < this.enemyTypes[i].getRespawnThreshold())
+                continue;
+
+            this.dtEnemies[i] += dt;
+            if (this.dtEnemies[i] < enemyTypes[i].getRespawnInterval())
+                continue;
+
+            this.dtEnemies[i] = 0;
+            for (int j = 0; j < this.enemies.length; j++)
+                if (this.enemies[j] == null || !this.enemies[j].isActive()) {
+                    try {
+                        this.enemies[j] = this.enemyTypes[i].getEnemyClass().newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    break;
+                }
         }
     }
 
-    public void draw(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    @Override
+    public void draw(Graphics2D g2d) {
         this.background.draw(g2d);
 
-        for (int i = 0; i < 16; i++) {                                               // DESENHA TIROS SIMPLES PLAYER
-            if (tiros[i].ativo())
-                tiros[i].draw(g2d);
-            //g2d.draw(new Rectangle2D.Double(tiros[i].getPX(), tiros[i].getPY(), 20, 8));
-        }
-        for (int i = 0; i < 3; i++) {                                               // DESENHA TIROS SIMPLES PLAYER
-            if (misseis[i].ativo())
-                misseis[i].draw(g2d);
-            //            g2d.draw(new Rectangle2D.Double(misseis[i].getPX(), misseis[i].getPY(), 22, 14));
-        }
+        for (Enemy enemy : this.enemies)
+            if (enemy != null)
+                enemy.draw(g2d);
+//        for (int i = 0; i < this.enemies.length; i++) {   // DEBUG ENEMIES
+//            Enemy enemy = this.enemies[i];
+//            if (enemy != null) {
+//                g2d.setColor(Color.GREEN);
+//                g2d.setFont(new Font("Arial", Font.BOLD, 36));
+//                g2d.drawString(String.valueOf(i), (int) enemy.getCollidableStartX(), (int) enemy.getCollidableEndY());
+//            }
+//        }
 
-        g2d.setColor(Color.WHITE);                                              // BRANCO
+        for (ShipExplosion explosion : this.explosions)
+            if (explosion != null)
+                explosion.draw(g2d);
 
-        for (int i = 0; i < 64; i++)
-            missilMissileDrop[i].draw(g2d);
+        for (EnemySimpleShot enemySimpleShot : this.enemySimpleShots)
+            if (enemySimpleShot != null)
+                enemySimpleShot.draw(g2d);
 
-        for (int i = 0; i < 16; i++) {                                           // DESENHA RedUFOS
-            redUFO[i].draw(g2d);
-            greenFire[i].draw(g2d);
-            bigBang[i].draw(g2d);
-            deathFish[i].draw(g2d);
-            for (int j = 0, w = (int) bigBang[i].getPX() + 6; j < bigBang[i].getHP(); j++, w += 20) {
-                g2d.setPaint(new Color(102, 0, 0));
-                g2d.fill(new Rectangle2D.Double(w, (int) bigBang[i].getPY() + 62, 18, 5));
-            }
-            for (int j = 0, w = (int) deathFish[i].getPX() + 2; j < deathFish[i].getHP(); j++, w += 12) {
-                g2d.setPaint(new Color(102, 0, 0));
-                g2d.fill(new Rectangle2D.Double(w, (int) deathFish[i].getPY() + 62, 10, 5));
-            }
-            //                for(int j = 0; j<4; j++) {
-            //                    if(tirosGreenFire[i][j].ativo() && greenFire[i].isAlive())
-            //                        tirosGreenFire[i][j].draw(g2d);
-            //        }
-            //            g2d.draw(new Rectangle2D.Double((int)deathFish[i].getPX()+2, (int)bigBang[i].getPY()+8, 60, 48));
-            //                g2d.setColor(Color.white);
-            //            g2d.drawString(String.valueOf(i), (int)redUFO[i].getPX(), (int)redUFO[i].getPY());
-            //            g2d.drawString(String.valueOf(i+16), (int)greenFire[i].getPX(), (int)greenFire[i].getPY());
-        }
-        if (!player.getBlink())
-            player.draw(g2d);                                                       // DESENHA NAVE PLAYER
-        //g2d.drawString(String.valueOf(contBlink), (int)player.getPX()+50, (int)player.getPY()+50);
-        //        g2d.drawString(, 200, 80);
-        //        for(int i=0, h2=80; i<16; i++, h2+=15) {
-        //            for (int j=0, h1=700; j<16; j++, h1+=15) {
-        //        g2d.draw(new Rectangle2D.Double(player.getPX()+62, player.getPY()+50, 60, 30);
+        for (PlayerSimpleShot playerSimpleShot : this.playerSimpleShots)
+            if (playerSimpleShot != null)
+                playerSimpleShot.draw(g2d);
 
-        //        g2d.draw(new Rectangle2D.Double(player.getPX()+62, player.getPY()+50, 60, 30));
-        //        g2d.draw(new Rectangle2D.Double(missilDrop[i].getPX()+16, missilDrop[i].getPY()+16, 32, 32));
-        //                g2d.drawString(i + " " + greenFire[i].frametime + " ", 10, h2);
-        //
-        //               g2d.drawString(deathFish[i].getIt() + " " + deathFish[i].getSentido(), 10, h2);
-        //                g2d.drawString("pY" + i + ": " + misseis[i].getPY(), 10, h2);
-        //                if (misseis[i].ativo()) {
-        //                    g2d.drawString("dX  : " + redUFO[i].getDX(), (int)(misseis[i].getPX()+(redUFO[i].getPX()+8-misseis[i].getPX()+22)/2-20), (int)misseis[i].getPY());
-        //                    g2d.drawString("dY  : " + redUFO[i].getDY(), (int)redUFO[i].getPX(), (int)(misseis[i].getPY()+(redUFO[i].getPY()-misseis[i].getPY())/2+15));
-        //                    g2d.draw(new Line2D.Double(misseis[i].getPX()+22, misseis[i].getPY()+6, redUFO[i].getPX(), misseis[i].getPY()+6));
-        //                    g2d.draw(new Line2D.Double(redUFO[i].getPX(), redUFO[i].getPY()+32, redUFO[i].getPX(), misseis[i].getPY()+6));
-        ////////////                if(redUFO[j].isAlive())
-        ////////////                    g2d.draw(new Line2D.Double(player.getPX()+128, player.getPY()+64, redUFO[j].getPX(), redUFO[j].getPY()+32));
-        ////////////                if(greenFire[j].isAlive())
-        ////////////                    g2d.draw(new Line2D.Double(player.getPX()+128, player.getPY()+64, greenFire[j].getPX(), greenFire[j].getPY()+32));
-        ////(int)(player.getPX()+50), (int)(player.getPY()+50), (int)((player.getPX()+50)+(redUFO[i].getPX()+8)-(misseis[i].getPX()+22)), (int)((player.getPY()+50)+(redUFO[i].getPY()+8)-(misseis[i].getPY())));
-        ////                    g2d.draw("dY  : " + ((redUFO[i].getPY()+8)-(misseis[i].getPY())), 10, h2);
-        //                }
-        //            }
-        //        }
+        for (PlayerMissileShot playerMissileShot : this.playerMissileShots)
+            if (playerMissileShot != null)
+                playerMissileShot.draw(g2d);
 
+        for (MissileDrop missileDrop : this.missileDrops)
+            if (missileDrop != null)
+                missileDrop.draw(g2d);
 
-
-//            g2d.drawString(testee + " " + recordes + " " + start, 10, 100);
+        this.player.draw(g2d);
 
         this.hud.draw(g2d);
-
-        if (player.getVidas() < 0)                                               //DESENHA GAME OVER
-            g2d.drawImage(gameOver, 796 / 2 - 600 / 2, 570 / 2 - 110 / 2, null);
+        this.gameOver.draw(g2d);
     }
 }

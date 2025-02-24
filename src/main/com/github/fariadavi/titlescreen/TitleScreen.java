@@ -45,12 +45,12 @@ public class TitleScreen extends CanvasGroupComponent {
             scoreboard.update(dt, canvasPanel);
 
             if (menu.isVisible())
-                menu.move(MOVE_DIRECTION_RIGHT, dt, 320);
+                menu.moveX(MOVE_DIRECTION_RIGHT, dt, 320);
             else
                 menu.deactivate();
 
             if (title.isVisible())
-                title.move(MOVE_DIRECTION_UP, dt, 170);
+                title.moveY(MOVE_DIRECTION_UP, dt, 170);
             else
                 title.deactivate();
 
@@ -61,12 +61,12 @@ public class TitleScreen extends CanvasGroupComponent {
             credits.update(dt, canvasPanel);
 
             if (menu.isVisible())
-                menu.move(MOVE_DIRECTION_RIGHT, dt, 200);
+                menu.moveX(MOVE_DIRECTION_RIGHT, dt, 200);
             else
                 menu.deactivate();
 
             if (title.isVisible())
-                title.move(MOVE_DIRECTION_UP, dt, 170);
+                title.moveY(MOVE_DIRECTION_UP, dt, 170);
             else
                 title.deactivate();
 

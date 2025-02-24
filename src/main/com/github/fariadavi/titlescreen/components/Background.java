@@ -24,7 +24,7 @@ public class Background extends CanvasGroupComponent {
 
     public void update(double dt, CanvasPanel canvasPanel) {
         for (int i = 0; i < 5; i++) {
-            bgImages[i].move(MOVE_DIRECTION_LEFT, dt, 70);
+            bgImages[i].moveX(MOVE_DIRECTION_LEFT, dt, 70);
             if (bgImages[i].getPX() < -290)
                 bgImages[i].setPX(bgImages[i].getPX() + 1450);
         }

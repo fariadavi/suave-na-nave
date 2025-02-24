@@ -45,6 +45,8 @@ public class TurboHUD extends CanvasGroupComponent {
                 canvasPanel.isPlayerTurboActive(),
                 canvasPanel.getPlayerTurboChargePercentage()
         );
+        if (turboStatus == null)
+            System.out.println("dsada");
         this.turboPlayerTextInfo.setTurboStatus(turboStatus);
         this.turboChargeBarTextInfo.setTurboStatus(turboStatus);
         this.turboChargeBar.setTurboStatus(turboStatus);

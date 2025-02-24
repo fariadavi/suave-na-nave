@@ -31,6 +31,8 @@ public class TurboChargeBar extends CanvasComponent {
 
     @Override
     public void draw(Graphics2D g2d) {
+        if (this.turboStatus == null) return;
+
         g2d.setColor(Color.white);
         g2d.draw(new Rectangle2D.Double(
                 this.getPX(),

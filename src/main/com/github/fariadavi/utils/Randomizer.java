@@ -7,4 +7,8 @@ public class Randomizer {
     public static int randInt(int min, int max) {
         return new Random().nextInt((max - min) + 1) + min;
     }
+
+    public static boolean randBoolean() {
+        return new Random().nextBoolean();
+    }
 }

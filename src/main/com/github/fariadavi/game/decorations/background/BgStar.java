@@ -58,7 +58,7 @@ public class BgStar extends CanvasComponent {
     public void update(double dt, CanvasPanel canvasPanel) {
         if (!this.isActive()) return;
 
-        this.move(MOVE_DIRECTION_LEFT, dt, (int) (this.color * 3 * canvasPanel.getPlayerSpeed()));
+        this.moveX(MOVE_DIRECTION_LEFT, dt, (int) (this.color * 3 * canvasPanel.getPlayerSpeedMultiplier()));
     }
 
     public void draw(Graphics2D g2d) {

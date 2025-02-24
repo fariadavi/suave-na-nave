@@ -4,10 +4,10 @@ import java.awt.*;
 
 public abstract class CanvasComponent {
 
-    public static final String MOVE_DIRECTION_LEFT = "LEFT";
-    public static final String MOVE_DIRECTION_RIGHT = "RIGHT";
-    public static final String MOVE_DIRECTION_UP = "UP";
-    public static final String MOVE_DIRECTION_DOWN = "DOWN";
+    public static final double MOVE_DIRECTION_LEFT = -1d;
+    public static final double MOVE_DIRECTION_RIGHT = 1d;
+    public static final double MOVE_DIRECTION_UP = -1d;
+    public static final double MOVE_DIRECTION_DOWN = 1d;
 
     private boolean isActive;
     private final boolean initialActive;
@@ -25,10 +25,7 @@ public abstract class CanvasComponent {
     protected CanvasComponent(int x, int y, boolean isActive) {
         this(isActive);
 
-        this.pX = x;
-        this.pY = y;
-        this.initialPX = this.pX;
-        this.initialPY = this.pY;
+        setInitialPosition(x, y);
     }
 
     public boolean isActive() {
@@ -45,6 +42,21 @@ public abstract class CanvasComponent {
 
     public void deactivate() {
         isActive = false;
+    }
+
+    protected void setInitialPosition(int x, int y) {
+        this.initialPX = x;
+        this.initialPY = y;
+        this.pX = this.initialPX;
+        this.pY = this.initialPY;
+    }
+
+    public double getInitialPY() {
+        return initialPY;
+    }
+
+    public double getInitialPX() {
+        return initialPX;
     }
 
     public double getPX() {
@@ -77,29 +89,11 @@ public abstract class CanvasComponent {
 
     public abstract boolean isVisible();
 
-    public void move(String direction, double dt, int dtMultiplier) {
-        double currentPX = this.getPX();
-        double currentPY = this.getPY();
-        double newPX = currentPX;
-        double newPY = currentPY;
+    public void moveX(double direction, double dt, double dtMultiplier) {
+        this.setPX(this.getPX() + direction * dtMultiplier * dt);
+    }
 
-        switch (direction) {
-            case MOVE_DIRECTION_LEFT:
-                newPX -= (dtMultiplier * dt);
-                break;
-            case MOVE_DIRECTION_RIGHT:
-                newPX += (dtMultiplier * dt);
-                break;
-            case MOVE_DIRECTION_UP:
-                newPY -= (dtMultiplier * dt);
-                break;
-            case MOVE_DIRECTION_DOWN:
-                newPY += (dtMultiplier * dt);
-                break;
-            default:
-        }
-
-        this.setPX(newPX);
-        this.setPY(newPY);
+    public void moveY(double direction, double dt, double dtMultiplier) {
+        this.setPY(this.getPY() + direction * dtMultiplier * dt);
     }
 }

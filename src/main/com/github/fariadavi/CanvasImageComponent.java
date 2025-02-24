@@ -8,7 +8,7 @@ import static main.com.github.fariadavi.utils.FileHelper.getImage;
 
 public class CanvasImageComponent extends CanvasComponent {
 
-    private final Image componentImage;
+    private Image componentImage;
 
     public static final double ALIGNMENT_START = 0d;
     public static final double ALIGNMENT_CENTER = 0.5d;
@@ -21,18 +21,37 @@ public class CanvasImageComponent extends CanvasComponent {
     private double initialWidth;
     private double initialHeight;
 
+    public CanvasImageComponent(String imageResourcePath, boolean isActive) {
+        super(isActive);
+
+        this.alignmentX = ALIGNMENT_START;
+        this.alignmentY = ALIGNMENT_START;
+
+        this.componentImage = getImage(imageResourcePath);
+        setInitialDimensions(this.componentImage.getWidth(null), this.componentImage.getHeight(null));
+    }
+
     public CanvasImageComponent(String imageResourcePath, int x, int y, boolean isActive) {
         super(x, y, isActive);
 
         this.alignmentX = ALIGNMENT_START;
         this.alignmentY = ALIGNMENT_START;
 
-        componentImage = getImage(imageResourcePath);
-        setDimensions(componentImage.getWidth(null), componentImage.getHeight(null));
+        this.componentImage = getImage(imageResourcePath);
+        setInitialDimensions(componentImage.getWidth(null), componentImage.getHeight(null));
     }
 
     public Image getComponentImage() {
         return componentImage;
+    }
+
+    public void setComponentImage(Image componentImage) {
+        this.componentImage = componentImage;
+    }
+
+    public void setComponentImage(String imageResourcePath) {
+        this.componentImage = getImage(imageResourcePath);
+        setDimensions(this.componentImage.getWidth(null), this.componentImage.getHeight(null));
     }
 
     public double getHeight() {
@@ -51,11 +70,17 @@ public class CanvasImageComponent extends CanvasComponent {
         this.width = width;
     }
 
-    public void setDimensions(double w, double h) {
+
+    public void setInitialDimensions(double w, double h) {
         this.width = w;
         this.height = h;
         this.initialWidth = this.width;
         this.initialHeight = this.height;
+    }
+
+    public void setDimensions(double w, double h) {
+        this.width = w;
+        this.height = h;
     }
 
     public void resetDimensions() {
@@ -107,5 +132,6 @@ public class CanvasImageComponent extends CanvasComponent {
         if (!this.isActive()) return;
 
         g2d.drawImage(componentImage, (int) getVisibleX(), (int) getVisibleY(), null);
+//        g2d.draw(new Rectangle((int) getVisibleX(), (int) getVisibleY(), (int) getWidth(), (int) getHeight()));
     }
 }

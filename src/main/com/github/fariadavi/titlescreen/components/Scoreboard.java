@@ -34,7 +34,7 @@ public class Scoreboard extends CanvasGroupComponent {
         if (!this.isActive()) return;
 
         if (this.getPY() > 80) {
-            this.move(MOVE_DIRECTION_UP, dt, 180);
+            this.moveY(MOVE_DIRECTION_UP, dt, 180);
             return;
         }
 

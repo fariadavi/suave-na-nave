@@ -1,6 +1,9 @@
 package main.com.github.fariadavi;
 
 import main.com.github.fariadavi.game.GameRun;
+import main.com.github.fariadavi.game.ships.enemy.Enemy;
+import main.com.github.fariadavi.game.ships.player.Player;
+import main.com.github.fariadavi.game.ships.Ship;
 import main.com.github.fariadavi.titlescreen.TitleScreen;
 import main.com.github.fariadavi.utils.InputManager;
 
@@ -108,16 +111,28 @@ public class CanvasPanel extends JPanel implements Runnable {
         this.gameRun = null;
     }
 
+    public Enemy getEnemyShipByIndex(Integer targetIndex) {
+        return this.gameRun.getEnemyShipByIndex(targetIndex);
+    }
+
+    public Enemy[] getEnemyShips() {
+        return this.gameRun.getEnemyShips();
+    }
+
+    public Player getPlayerShip() {
+        return this.gameRun.getPlayerShip();
+    }
+
     public int getPlayerScore() {
-        return this.gameRun.getPlayerScore();
+        return this.gameRun.getScore();
     }
 
     public double[] getPlayerPosition() {
         return this.gameRun.getPlayerPosition();
     }
 
-    public int getPlayerLives() {
-        return this.gameRun.getPlayerLives();
+    public int getPlayerHealthPoints() {
+        return this.gameRun.getPlayerHealthPoints();
     }
 
     public int getPlayerMissileCharges() {
@@ -132,16 +147,40 @@ public class CanvasPanel extends JPanel implements Runnable {
         return this.gameRun.isPlayerTurboActive();
     }
 
-    public double getPlayerTempoTurbo() {
-        return this.gameRun.getPlayerTempoTurbo();
-    }
-
     public double getPlayerTurboChargePercentage() {
         return this.gameRun.getPlayerTurboChargePercentage();
     }
 
-    public double getPlayerSpeed() {
-        return this.gameRun.getPlayerSpeed();
+    public double getPlayerSpeedMultiplier() {
+        return this.gameRun.getPlayerSpeedMultiplier();
+    }
+
+    public void createPlayerSimpleShot() {
+        this.gameRun.createPlayerSimpleShot();
+    }
+
+    public void createPlayerMissileShot() {
+        this.gameRun.createPlayerMissileShot();
+    }
+
+    public void createEnemySimpleShot(Enemy enemy) {
+        this.gameRun.createEnemySimpleShot(enemy);
+    }
+
+    public void explodeShip(Ship ship) {
+        this.gameRun.explodeShip(ship);
+    }
+
+    public void dropMissile(int x, int y) {
+        this.gameRun.dropMissile(x, y);
+    }
+
+    public void addBountyToScore(Enemy collidedEnemy) {
+       this.gameRun.addBountyToScore(collidedEnemy);
+    }
+
+    public void addPlayerMissileCharges(int missileCharges) {
+        this.gameRun.addPlayerMissileCharges(missileCharges);
     }
 
     public int getLowestHighScore() {
