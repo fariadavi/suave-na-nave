@@ -86,6 +86,7 @@ public class CanvasPanel extends JPanel implements Runnable {
         this.scoreManager = new ScoreManager();
 
         this.titlescreen = new TitleScreen();
+        this.gameRun = new GameRun();
     }
 
     public void showScoreboard() {
@@ -102,13 +103,16 @@ public class CanvasPanel extends JPanel implements Runnable {
     }
 
     public void startNewGameRun() {
-        this.titlescreen = null;
-        this.gameRun = new GameRun();
+        this.titlescreen.reset();
+        this.titlescreen.deactivate();
+
+        this.gameRun.activate();
     }
 
     public void finishGameRun() {
-        this.titlescreen = new TitleScreen();
-        this.gameRun = null;
+        this.titlescreen.activate();
+
+        this.gameRun = new GameRun();
     }
 
     public Enemy getEnemyShipByIndex(Integer targetIndex) {
@@ -176,7 +180,7 @@ public class CanvasPanel extends JPanel implements Runnable {
     }
 
     public void addBountyToScore(Enemy collidedEnemy) {
-       this.gameRun.addBountyToScore(collidedEnemy);
+        this.gameRun.addBountyToScore(collidedEnemy);
     }
 
     public void addPlayerMissileCharges(int missileCharges) {
@@ -192,28 +196,14 @@ public class CanvasPanel extends JPanel implements Runnable {
     }
 
     private void update(double dt) throws IOException {
-        if (this.titlescreen != null) {
-            this.titlescreen.update(dt, this);
-            return;
-        }
-
-        if (this.gameRun != null) {
-            this.gameRun.update(dt, this);
-            return;
-        }
+        this.titlescreen.update(dt, this);
+        this.gameRun.update(dt, this);
     }
 
     private void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
-        if (this.titlescreen != null) {
-            this.titlescreen.draw(g2d);
-            return;
-        }
-
-        if (this.gameRun != null) {
-            this.gameRun.draw(g2d);
-            return;
-        }
+        this.titlescreen.draw(g2d);
+        this.gameRun.draw(g2d);
     }
 }

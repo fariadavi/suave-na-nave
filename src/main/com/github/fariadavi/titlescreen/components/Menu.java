@@ -5,6 +5,7 @@ import main.com.github.fariadavi.CanvasPanel;
 
 import java.awt.event.KeyEvent;
 
+import static main.com.github.fariadavi.MainFrame.isEmbedded;
 import static main.com.github.fariadavi.utils.SpriteMappings.*;
 
 public class Menu extends CanvasGroupComponent {
@@ -13,14 +14,21 @@ public class Menu extends CanvasGroupComponent {
     public static final String ACTION_HIGHSCORES = "HIGHSCORES";
     public static final String ACTION_CREDITS = "CREDITS";
     public static final String ACTION_QUITGAME = "EXIT";
-    public final String[][] menuOptionsInfo = {
-            {ACTION_NEWRUN, SPRITE_MENUOPTION_NEWGAME_PATH},
-            {ACTION_HIGHSCORES, SPRITE_MENUOPTION_HIGHSCORES_PATH},
-            {ACTION_CREDITS, SPRITE_MENUOPTION_CREDITS_PATH},
-            {ACTION_QUITGAME, SPRITE_MENUOPTION_QUITGAME_PATH}
-    };
+    public final String[][] menuOptionsInfo =
+            isEmbedded ?
+                    new String[][]{
+                            {ACTION_NEWRUN, SPRITE_MENUOPTION_NEWGAME_PATH},
+                            {ACTION_HIGHSCORES, SPRITE_MENUOPTION_HIGHSCORES_PATH},
+                            {ACTION_CREDITS, SPRITE_MENUOPTION_CREDITS_PATH}
+                    } :
+                    new String[][]{
+                            {ACTION_NEWRUN, SPRITE_MENUOPTION_NEWGAME_PATH},
+                            {ACTION_HIGHSCORES, SPRITE_MENUOPTION_HIGHSCORES_PATH},
+                            {ACTION_CREDITS, SPRITE_MENUOPTION_CREDITS_PATH},
+                            {ACTION_QUITGAME, SPRITE_MENUOPTION_QUITGAME_PATH}
+                    };
 
-    private final MenuOption[] menuOptions = new MenuOption[4];
+    private final MenuOption[] menuOptions = new MenuOption[menuOptionsInfo.length];
     private int highlightedMenuOption = 0;
 
     public Menu(int x, int y) {
@@ -31,7 +39,7 @@ public class Menu extends CanvasGroupComponent {
                     menuOptionsInfo[i][0],
                     menuOptionsInfo[i][1],
                     x,
-                    y + (i * 60),
+                    y + (isEmbedded ? 15 : 0) + (i * 60 + (isEmbedded ? 15 : 0)),
                     true,
                     i == highlightedMenuOption
             );

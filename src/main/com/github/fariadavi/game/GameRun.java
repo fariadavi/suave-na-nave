@@ -47,7 +47,7 @@ public class GameRun extends CanvasGroupComponent {
     private final MissileDrop[] missileDrops = new MissileDrop[16];
 
     public GameRun() {
-        super(true);
+        super(false);
         this.background = new GameBackground();
         this.hud = new HeadsUpDisplay(MAX_HEALTH, MAX_MISSILES);
         this.player = new Player(80, 280);
@@ -186,6 +186,8 @@ public class GameRun extends CanvasGroupComponent {
     }
 
     public void update(double dt, CanvasPanel canvasPanel) {
+        if (!this.isActive()) return;
+
         this.hud.update(dt, canvasPanel);
         for (ShipExplosion explosion : this.explosions) {
             if (explosion != null)
@@ -255,6 +257,8 @@ public class GameRun extends CanvasGroupComponent {
 
     @Override
     public void draw(Graphics2D g2d) {
+        if (!this.isActive()) return;
+
         this.background.draw(g2d);
 
         for (Enemy enemy : this.enemies)
