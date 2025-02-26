@@ -5,7 +5,7 @@ import main.com.github.fariadavi.game.ships.enemy.Enemy;
 
 import static main.com.github.fariadavi.utils.SpriteMappings.SPRITE_PLAYER_MISSILE_2_PATH;
 
-public class PlayerMissileShot extends NewShot {
+public class PlayerMissileShot extends Shot {
 
     private final Integer targetIndex;
 

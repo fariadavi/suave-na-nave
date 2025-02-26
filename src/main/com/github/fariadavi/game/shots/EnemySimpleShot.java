@@ -5,7 +5,7 @@ import main.com.github.fariadavi.game.ships.player.Player;
 
 import static main.com.github.fariadavi.utils.SpriteMappings.SPRITE_ENEMY_SIMPLE_SHOT_PATH;
 
-public class EnemySimpleShot extends NewShot {
+public class EnemySimpleShot extends Shot {
 
     public EnemySimpleShot(int x, int y) {
         super(SPRITE_ENEMY_SIMPLE_SHOT_PATH, x, y, true);
