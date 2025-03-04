@@ -11,21 +11,17 @@ public class FileHelper {
 
     public static final String RESOURCES_PATH = "main/resources/";
 
-    public static Image getImage(String imagePath) {
-        return new ImageIcon(getResource(imagePath)).getImage();
+    public static Image getImage(String imageFileName) {
+        return new ImageIcon(getResource(RESOURCES_PATH + imageFileName)).getImage();
     }
 
     private static URL getResource(String path) {
-        return FileHelper.class.getClassLoader().getResource(RESOURCES_PATH + path);
-    }
-
-    private static InputStream getResourceAsStream(String path) {
-        return FileHelper.class.getClassLoader().getResourceAsStream(RESOURCES_PATH + path);
+        return FileHelper.class.getClassLoader().getResource(path);
     }
 
     public static void writeFile(String filePath, String contents) {
         try {
-            FileWriter fileWriter = new FileWriter(getResource(filePath).getPath());
+            FileWriter fileWriter = new FileWriter(filePath);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(contents);
             bufferedWriter.close();
@@ -39,9 +35,8 @@ public class FileHelper {
 
         int i = 0;
         try {
-            InputStream resourceAsStream = getResourceAsStream(filePath);
-            InputStreamReader streamReader = new InputStreamReader(resourceAsStream);
-            BufferedReader bufferedReader = new BufferedReader(streamReader);
+            FileReader fileReader = new FileReader(filePath);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             while ((line = bufferedReader.readLine()) != null && i < NUM_HIGHSCORES)
                 scores[i++] = line;
