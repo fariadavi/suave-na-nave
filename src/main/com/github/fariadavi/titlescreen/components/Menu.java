@@ -51,23 +51,30 @@ public class Menu extends CanvasGroupComponent {
     public void update(double dt, CanvasPanel canvasPanel) {
         if (!super.isActive()) return;
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_UP) && highlightedMenuOption > 0) {
+        if (highlightedMenuOption > 0 && (
+                canvasPanel.isKeyPressed(KeyEvent.VK_UP) || canvasPanel.isKeyPressed(KeyEvent.VK_W)
+        )) {
             canvasPanel.clearKeyPress(KeyEvent.VK_UP);
+            canvasPanel.clearKeyPress(KeyEvent.VK_W);
 
             menuOptions[highlightedMenuOption].setHighlighted(false);
             menuOptions[highlightedMenuOption - 1].setHighlighted(true);
             highlightedMenuOption--;
 
-        } else if (canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) && highlightedMenuOption < menuOptions.length - 1) {
+        } else if (highlightedMenuOption < menuOptions.length - 1 && (
+                canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) && canvasPanel.isKeyPressed(KeyEvent.VK_S)
+        )) {
             canvasPanel.clearKeyPress(KeyEvent.VK_DOWN);
+            canvasPanel.clearKeyPress(KeyEvent.VK_S);
 
             menuOptions[highlightedMenuOption].setHighlighted(false);
             menuOptions[highlightedMenuOption + 1].setHighlighted(true);
             highlightedMenuOption++;
         }
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_ENTER)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_ENTER) || canvasPanel.isKeyPressed(KeyEvent.VK_SPACE)) {
             canvasPanel.clearKeyPress(KeyEvent.VK_ENTER);
+            canvasPanel.clearKeyPress(KeyEvent.VK_SPACE);
 
             menuOptions[highlightedMenuOption].executeAction(canvasPanel);
         }

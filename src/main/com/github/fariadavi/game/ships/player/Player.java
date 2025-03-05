@@ -113,19 +113,19 @@ public class Player extends Ship {
     }
 
     private void handleMovement(double dt, CanvasPanel canvasPanel) {
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_RIGHT) &&
+        if ((canvasPanel.isKeyPressed(KeyEvent.VK_RIGHT) || canvasPanel.isKeyPressed(KeyEvent.VK_D)) &&
                 this.getPX() < WINDOW_WIDTH - (this.getWidth() - this.getCollisionInsetX()))
             this.moveX(MOVE_DIRECTION_RIGHT, dt, getSpeed());
 
-        else if (canvasPanel.isKeyPressed(KeyEvent.VK_LEFT) &&
+        else if ((canvasPanel.isKeyPressed(KeyEvent.VK_LEFT) || canvasPanel.isKeyPressed(KeyEvent.VK_A)) &&
                 this.getPX() > (getCollisionOffsetX() + getCollisionInsetX()) * -1)
             this.moveX(MOVE_DIRECTION_LEFT, dt, getSpeed());
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_UP) &&
+        if ((canvasPanel.isKeyPressed(KeyEvent.VK_UP) || canvasPanel.isKeyPressed(KeyEvent.VK_W)) &&
                 this.getPY() > (getCollisionOffsetY() + getCollisionInsetY()) * -1)
             this.moveY(MOVE_DIRECTION_UP, dt, getSpeed());
 
-        else if (canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) &&
+        else if ((canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) || canvasPanel.isKeyPressed(KeyEvent.VK_S)) &&
                 this.getPY() < WINDOW_HEIGHT - (this.getHeight() - this.getCollisionInsetY()))
             this.moveY(MOVE_DIRECTION_DOWN, dt, getSpeed());
     }
@@ -136,7 +136,7 @@ public class Player extends Ship {
             return;
         }
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_V)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_SPACE)) {
             canvasPanel.createPlayerSimpleShot();
             this.dtShooting = 0;
         }
@@ -150,7 +150,7 @@ public class Player extends Ship {
             return;
         }
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_B)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_CONTROL)) {
             canvasPanel.createPlayerMissileShot();
             this.dtMissile = 0;
             this.numMissileCharges--;
