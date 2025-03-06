@@ -62,7 +62,7 @@ public class Menu extends CanvasGroupComponent {
             highlightedMenuOption--;
 
         } else if (highlightedMenuOption < menuOptions.length - 1 && (
-                canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) && canvasPanel.isKeyPressed(KeyEvent.VK_S)
+                canvasPanel.isKeyPressed(KeyEvent.VK_DOWN) || canvasPanel.isKeyPressed(KeyEvent.VK_S)
         )) {
             canvasPanel.clearKeyPress(KeyEvent.VK_DOWN);
             canvasPanel.clearKeyPress(KeyEvent.VK_S);

@@ -38,8 +38,9 @@ public class Scoreboard extends CanvasGroupComponent {
             return;
         }
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_ENTER)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_ENTER) || canvasPanel.isKeyPressed(KeyEvent.VK_SPACE)) {
             canvasPanel.clearKeyPress(KeyEvent.VK_ENTER);
+            canvasPanel.clearKeyPress(KeyEvent.VK_SPACE);
 
             canvasPanel.resetTitleScreen();
         }
