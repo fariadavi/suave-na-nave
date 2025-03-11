@@ -150,7 +150,7 @@ public class Player extends Ship {
             return;
         }
 
-        if (canvasPanel.isKeyPressed(KeyEvent.VK_CONTROL)) {
+        if (canvasPanel.isKeyPressed(KeyEvent.VK_Q)) {
             canvasPanel.createPlayerMissileShot();
             this.dtMissile = 0;
             this.numMissileCharges--;

@@ -23,7 +23,7 @@ pretty fun experience to develop it as a student back then, and it was just as f
 
 - Use the `arrow` keys or `WASD` keys to move your spaceship.
 - Press the `spacebar` to shoot bullets.
-- Press the `ctrl` key to fire a missile that targets and chases the nearest enemy.
+- Press the `Q` key to fire a missile that targets and chases the nearest enemy.
 - Press the `shift` key to activate your turbo when it's charged.
 - Defeat enemies to score points.
 - Destroyed enemies may drop missile charges — collect them to refill your missile stock.
